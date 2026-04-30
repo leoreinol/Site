@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leonardo Scaburi Reinol – Consultoria em Carteiras Físicas de Criptomoedas</title>
+<meta name="description" content="Consultoria especializada em segurança e custódia de criptoativos. Configuração de hardware wallets, recuperação de saldo e suporte Trezor.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #0a0e17;
+  --bg-card: #111827;
+  --bg-card-hover: #1a2332;
+  --accent-amber: #f59e0b;
+  --accent-amber-dim: rgba(245, 158, 11, 0.15);
+  --accent-amber-glow: rgba(245, 158, 11, 0.4);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: rgba(255,255,255,0.06);
+  --border-accent: rgba(245, 158, 11, 0.25);
+  --gradient-gold: linear-gradient(135deg, #f59e0b, #d97706, #b45309);
+  --gradient-dark: linear-gradient(180deg, #0a0e17 0%, #111827 100%);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
+  --shadow-glow: 0 0 60px rgba(245, 158, 11, 0.08);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Utility ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+.sr-only { position: absolute; width: 1px; height: 1px; clip: rect(0,0,0,0); overflow: hidden; }
+
+/* ── Noise Overlay ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Navigation ── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 16px 0;
+  transition: background 0.4s, backdrop-filter 0.4s;
+}
+.nav.scrolled {
+  background: rgba(10, 14, 23, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1200px; margin: 0 auto; padding: 0 24px;
+}
+.nav-logo {
+  font-weight: 700; font-size: 1.1rem;
+  color: var(--accent-amber);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--text-secondary); font-weight: 400; }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  color: var(--text-secondary); text-decoration: none;
+  font-size: 0.9rem; font-weight: 500;
+  transition: color 0.3s;
+  position: relative;
+}
+.nav-links a:hover { color: var(--text-primary); }
+.nav-links a::after {
+  content: ''; position: absolute;
+  bottom: -4px; left: 0; width: 0; height: 2px;
+  background: var(--accent-amber);
+  transition: width 0.3s;
+}
+.nav-links a:hover::after { width: 100%; }
+.nav-cta {
+  background: var(--gradient-gold);
+  color: #000 !important; font-weight: 600 !important;
+  padding: 10px 24px; border-radius: 50px;
+  font-size: 0.85rem !important;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-amber-glow); }
+.nav-cta::after { display: none !important; }
+
+.mobile-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+.mobile-toggle span { display: block; width: 24px; height: 2px; background: var(--text-primary); margin: 5px 0; transition: 0.3s; }
+
+/* ── Hero ── */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 120px 0 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -50%; right: -30%;
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute; bottom: -40%; left: -20%;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+  position: relative; z-index: 1;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent-amber-dim);
+  border: 1px solid var(--border-accent);
+  padding: 8px 18px; border-radius: 50px;
+  font-size: 0.8rem; font-weight: 500;
+  color: var(--accent-amber);
+  margin-bottom: 28px;
+}
+.hero-badge .dot {
+  width: 6px; height: 6px;
+  background: var(--accent-amber);
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.hero h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+}
+.hero h1 .highlight {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-desc {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 40px;
+  max-width: 520px;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--gradient-gold);
+  color: #000; font-weight: 600;
+  padding: 16px 36px; border-radius: 50px;
+  text-decoration: none; font-size: 0.95rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: none; cursor: pointer;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-amber-glow); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-primary); font-weight: 500;
+  padding: 16px 36px; border-radius: 50px;
+  text-decoration: none; font-size: 0.95rem;
+  transition: border-color 0.3s, background 0.3s;
+  cursor: pointer;
+}
+.btn-secondary:hover { border-color: var(--accent-amber); background: var(--accent-amber-dim); }
+
+/* Hero Image */
+.hero-visual {
+  position: relative;
+  display: flex; justify-content: center; align-items: center;
+}
+.hero-img-wrapper {
+  position: relative;
+  width: 380px; height: 380px;
+  border-radius: 32px;
+  overflow: hidden;
+  border: 2px solid var(--border-accent);
+  box-shadow: var(--shadow-glow);
+}
+.hero-img-wrapper img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: contrast(1.05);
+}
+.hero-float-card {
+  position: absolute;
+  background: rgba(17, 24, 39, 0.9);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+  animation: float 6s ease-in-out infinite;
+}
+.hero-float-card.top-right {
+  top: -20px; right: -30px;
+  animation-delay: 0s;
+}
+.hero-float-card.bottom-left {
+  bottom: -20px; left: -30px;
+  animation-delay: 3s;
+}
+.float-icon {
+  width: 40px; height: 40px;
+  background: var(--accent-amber-dim);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+}
+.float-label { font-size: 0.75rem; color: var(--text-muted); }
+.float-value { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ── Stats Bar ── */
+.stats-bar {
+  padding: 48px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 32px; text-align: center;
+}
+.stat-item .stat-number {
+  font-size: 2.2rem; font-weight: 800;
+  color: var(--accent-amber);
+  letter-spacing: -0.02em;
+}
+.stat-item .stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ── Sections shared ── */
+.section { padding: 100px 0; }
+.section-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.8rem; font-weight: 600;
+  color: var(--accent-amber);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 16px;
+}
+.section-label::before {
+  content: ''; width: 24px; height: 2px;
+  background: var(--accent-amber);
+}
+.section-title {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.section-desc {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+/* ── About ── */
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+  margin-top: 60px;
+}
+.about-text p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.8;
+  font-size: 1.02rem;
+}
+.about-highlights {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px; margin-top: 32px;
+}
+.about-highlight {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  transition: border-color 0.3s;
+}
+.about-highlight:hover { border-color: var(--border-accent); }
+.about-highlight .ah-icon { font-size: 1.5rem; margin-bottom: 10px; }
+.about-highlight .ah-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+.about-highlight .ah-desc { font-size: 0.8rem; color: var(--text-muted); }
+
+.about-visual {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  overflow: hidden;
+}
+.about-visual::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(245,158,11,0.08), transparent 70%);
+}
+.timeline-item {
+  display: flex; gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.timeline-item:last-child { border: none; }
+.timeline-year {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent-amber);
+  font-weight: 600;
+  min-width: 50px;
+}
+.timeline-text { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; }
+
+/* ── Services ── */
+.services-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 24px; margin-top: 60px;
+}
+.service-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.service-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gradient-gold);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.service-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-glow);
+}
+.service-card:hover::before { opacity: 1; }
+.service-icon {
+  width: 56px; height: 56px;
+  background: var(--accent-amber-dim);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+}
+.service-card h3 {
+  font-size: 1.15rem; font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+.service-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.service-tag {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent-amber);
+  background: var(--accent-amber-dim);
+  padding: 4px 12px;
+  border-radius: 50px;
+}
+
+/* ── Curso ── */
+.curso-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius);
+  padding: 60px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: center;
+  margin-top: 60px;
+  position: relative;
+  overflow: hidden;
+}
+.curso-banner::before {
+  content: '';
+  position: absolute; top: -50%; right: -20%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(245,158,11,0.06), transparent 70%);
+}
+.curso-content h3 {
+  font-size: 1.8rem; font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+.curso-content p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.curso-features {
+  list-style: none;
+  display: flex; flex-direction: column; gap: 12px;
+  margin-bottom: 32px;
+}
+.curso-features li {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 0.92rem; color: var(--text-secondary);
+}
+.curso-features li::before {
+  content: '✓';
+  color: var(--accent-amber);
+  font-weight: 700;
+  width: 24px; height: 24px;
+  background: var(--accent-amber-dim);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+.curso-visual {
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 40px;
+  text-align: center;
+  position: relative;
+}
+.curso-visual .trezor-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 30px rgba(245,158,11,0.2));
+}
+.curso-visual .curso-platform { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+
+/* ── YouTube ── */
+.youtube-section { background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.yt-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: center;
+  margin-top: 60px;
+}
+.yt-visual {
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+}
+.yt-play-btn {
+  width: 80px; height: 80px;
+  background: #ff0000;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.yt-play-btn:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(255,0,0,0.3); }
+.yt-play-btn svg { width: 32px; height: 32px; fill: #fff; margin-left: 4px; }
+.yt-channel-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
+.yt-channel-handle { font-size: 0.85rem; color: var(--text-muted); }
+.yt-topics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; justify-content: center; }
+.yt-topic {
+  font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.05);
+  padding: 6px 14px; border-radius: 50px;
+  border: 1px solid var(--border);
+}
+.yt-text p {
+  color: var(--text-secondary);
+  line-height: 1.8; margin-bottom: 20px;
+}
+.yt-text .yt-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: #ff4444; font-weight: 600;
+  text-decoration: none;
+  transition: gap 0.3s;
+}
+.yt-text .yt-link:hover { gap: 14px; }
+
+/* ── Process ── */
+.process-steps {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 24px; margin-top: 60px;
+}
+.process-step {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  text-align: center;
+  position: relative;
+  transition: border-color 0.3s;
+}
+.process-step:hover { border-color: var(--border-accent); }
+.step-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.5rem; font-weight: 700;
+  color: var(--accent-amber);
+  opacity: 0.3;
+  margin-bottom: 16px;
+}
+.process-step h4 { font-weight: 700; margin-bottom: 10px; font-size: 1rem; }
+.process-step p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ── Contact ── */
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; margin-top: 60px;
+}
+.contact-form { display: flex; flex-direction: column; gap: 20px; }
+.form-group label {
+  display: block; font-size: 0.85rem; font-weight: 500;
+  color: var(--text-secondary); margin-bottom: 8px;
+}
+.form-group input, .form-group textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  outline: none;
+}
+.form-group input:focus, .form-group textarea:focus {
+  border-color: var(--accent-amber);
+  box-shadow: 0 0 0 3px var(--accent-amber-dim);
+}
+.form-group textarea { resize: vertical; min-height: 140px; }
+
+.contact-info {
+  display: flex; flex-direction: column; gap: 24px;
+}
+.contact-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  display: flex; align-items: center; gap: 20px;
+  transition: border-color 0.3s;
+  text-decoration: none; color: inherit;
+}
+.contact-card:hover { border-color: var(--border-accent); }
+.contact-icon {
+  width: 52px; height: 52px;
+  background: var(--accent-amber-dim);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.contact-card .cc-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2px; }
+.contact-card .cc-value { font-weight: 600; font-size: 0.95rem; }
+
+.social-links {
+  display: flex; gap: 12px; margin-top: 16px;
+}
+.social-link {
+  width: 48px; height: 48px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; color: var(--text-secondary);
+  transition: border-color 0.3s, color 0.3s, background 0.3s;
+  font-size: 1.2rem;
+}
+.social-link:hover {
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
+  background: var(--accent-amber-dim);
+}
+
+/* ── Footer ── */
+.footer {
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.footer p { font-size: 0.85rem; color: var(--text-muted); }
+.footer a { color: var(--accent-amber); text-decoration: none; }
+.footer .kriptobr-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 12px;
+  font-size: 0.8rem; color: var(--text-muted);
+}
+
+/* ── Animations ── */
+.fade-in {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 50px; text-align: center; }
+  .hero-desc { margin: 0 auto 40px; }
+  .hero-actions { justify-content: center; }
+  .hero-visual { order: -1; }
+  .hero-img-wrapper { width: 300px; height: 300px; }
+  .about-grid { grid-template-columns: 1fr; gap: 50px; }
+  .services-grid { grid-template-columns: repeat(2, 1fr); }
+  .curso-banner { grid-template-columns: 1fr; padding: 40px; }
+  .yt-grid { grid-template-columns: 1fr; }
+  .process-steps { grid-template-columns: repeat(2, 1fr); }
+  .contact-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .mobile-toggle { display: block; }
+  .hero { padding: 100px 0 60px; }
+  .hero h1 { font-size: 2.2rem; }
+  .hero-img-wrapper { width: 260px; height: 260px; }
+  .hero-float-card { display: none; }
+  .services-grid { grid-template-columns: 1fr; }
+  .process-steps { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .section { padding: 70px 0; }
+  .curso-banner { padding: 30px; }
+}
+
+/* ── Mobile menu ── */
+.mobile-menu {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(10, 14, 23, 0.95);
+  backdrop-filter: blur(20px);
+  z-index: 99;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 32px;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  color: var(--text-primary); text-decoration: none;
+  font-size: 1.3rem; font-weight: 600;
+}
+.mobile-menu .close-menu {
+  position: absolute; top: 20px; right: 24px;
+  background: none; border: none;
+  color: var(--text-primary); font-size: 2rem;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav" id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">SCABURI <span>CRYPTO</span></a>
+    <ul class="nav-links">
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#servicos">Serviços</a></li>
+      <li><a href="#curso">Curso</a></li>
+      <li><a href="#youtube">YouTube</a></li>
+      <li><a href="#contato" class="nav-cta">Agendar Consultoria</a></li>
+    </ul>
+    <button class="mobile-toggle" onclick="document.getElementById('mobileMenu').classList.add('open')" aria-label="Abrir menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="close-menu" onclick="this.parentElement.classList.remove('open')">&times;</button>
+  <a href="#sobre" onclick="this.parentElement.classList.remove('open')">Sobre</a>
+  <a href="#servicos" onclick="this.parentElement.classList.remove('open')">Serviços</a>
+  <a href="#curso" onclick="this.parentElement.classList.remove('open')">Curso</a>
+  <a href="#youtube" onclick="this.parentElement.classList.remove('open')">YouTube</a>
+  <a href="#contato" onclick="this.parentElement.classList.remove('open')">Agendar Consultoria</a>
+</div>
+
+<!-- Hero -->
+<section class="hero" id="inicio">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          Especialista desde 2014
+        </div>
+        <h1>Segurança e custódia de <span class="highlight">criptoativos</span> sem complicação</h1>
+        <p class="hero-desc">Consultoria personalizada para quem quer proteger suas criptomoedas com carteiras físicas. Da configuração inicial ao suporte avançado.</p>
+        <div class="hero-actions">
+          <a href="#contato" class="btn-primary">
+            Agendar Consultoria
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#servicos" class="btn-secondary">Ver Serviços</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-img-wrapper">
+          <img src="https://leonardoscaburi.com.br/wp-content/uploads/2026/03/leonardo-1024x1024.jpg" alt="Leonardo Scaburi Reinol" loading="eager">
+        </div>
+        <div class="hero-float-card top-right">
+          <div class="float-icon">🔐</div>
+          <div>
+            <div class="float-label">Foco em</div>
+            <div class="float-value">Hardware Wallets</div>
+          </div>
+        </div>
+        <div class="hero-float-card bottom-left">
+          <div class="float-icon">🛡️</div>
+          <div>
+            <div class="float-label">Experiência</div>
+            <div class="float-value">+10 anos em crypto</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item fade-in">
+        <div class="stat-number">+10</div>
+        <div class="stat-label">Anos no mercado cripto</div>
+      </div>
+      <div class="stat-item fade-in">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Consultorias realizadas</div>
+      </div>
+      <div class="stat-item fade-in">
+        <div class="stat-number">Trezor</div>
+        <div class="stat-label">Especialista certificado</div>
+      </div>
+      <div class="stat-item fade-in">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Online e personalizado</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- About -->
+<section class="section" id="sobre">
+  <div class="container">
+    <div class="section-label">Sobre mim</div>
+    <div class="section-title">Quem é Leonardo Scaburi?</div>
+    <div class="about-grid">
+      <div class="about-text fade-in">
+        <p>Sou entusiasta do mercado de criptomoedas desde meados de 2014. Ao longo desses anos, percebi que a maioria das pessoas não sabe tomar o devido cuidado para armazenar de forma correta seus criptoativos.</p>
+        <p>Meu foco é em segurança e custódia — ajudando pessoas comuns a protegerem seus investimentos usando carteiras físicas (hardware wallets) da forma correta, sem complicação e sem risco de perder seus fundos.</p>
+        <p>Além da consultoria individual, produzo conteúdo educativo no YouTube e ofereço um curso completo focado na Trezor, a hardware wallet mais confiável do mercado.</p>
+        <div class="about-highlights">
+          <div class="about-highlight">
+            <div class="ah-icon">🎓</div>
+            <div class="ah-title">Formação</div>
+            <div class="ah-desc">UFSC – Administração</div>
+          </div>
+          <div class="about-highlight">
+            <div class="ah-icon">📍</div>
+            <div class="ah-title">Localização</div>
+            <div class="ah-desc">Florianópolis, SC</div>
+          </div>
+          <div class="about-highlight">
+            <div class="ah-icon">🎯</div>
+            <div class="ah-title">Foco</div>
+            <div class="ah-desc">Segurança & Custódia</div>
+          </div>
+          <div class="about-highlight">
+            <div class="ah-icon">📺</div>
+            <div class="ah-title">YouTube</div>
+            <div class="ah-desc">Conteúdo gratuito</div>
+          </div>
+        </div>
+      </div>
+      <div class="about-visual fade-in">
+        <div class="timeline-item">
+          <div class="timeline-year">2014</div>
+          <div class="timeline-text">Início no mercado de criptomoedas. Estudos sobre Bitcoin, blockchain e segurança digital.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2018</div>
+          <div class="timeline-text">Primeira hardware wallet adquirida. Percepção da importância da auto-custódia.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2020</div>
+          <div class="timeline-text">Criação do canal no YouTube focado em segurança de criptoativos e tutoriais de hardware wallets.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2023</div>
+          <div class="timeline-text">Lançamento do curso completo de Trezor na Hotmart. Início das consultorias individuais.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2026</div>
+          <div class="timeline-text">Centenas de consultorias realizadas. Referência em segurança de criptoativos no Brasil.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section class="section" id="servicos" style="background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-label">Serviços</div>
+    <div class="section-title">Consultoria Especializada</div>
+    <div class="section-desc">Atendimento personalizado e individual para resolver qualquer dúvida ou problema com suas carteiras físicas de criptomoedas.</div>
+    <div class="services-grid">
+      <div class="service-card fade-in">
+        <div class="service-icon">⚙️</div>
+        <h3>Configurar Carteira</h3>
+        <p>Configuração completa da sua hardware wallet do zero. Setup inicial, criação segura da seed phrase, backup e boas práticas de segurança.</p>
+        <span class="service-tag">Setup Completo</span>
+      </div>
+      <div class="service-card fade-in">
+        <div class="service-icon">💰</div>
+        <h3>Recuperar Saldo</h3>
+        <p>Recuperação de acesso a criptoativos em carteiras que você não consegue acessar. Restauração de seed, migração entre dispositivos.</p>
+        <span class="service-tag">Recuperação</span>
+      </div>
+      <div class="service-card fade-in">
+        <div class="service-icon">📤</div>
+        <h3>Enviar Criptoativos</h3>
+        <p>Suporte passo a passo para enviar e receber criptomoedas com segurança usando sua hardware wallet. Evite erros irreversíveis.</p>
+        <span class="service-tag">Transações</span>
+      </div>
+      <div class="service-card fade-in">
+        <div class="service-icon">🔧</div>
+        <h3>Suporte Trezor</h3>
+        <p>Especialista em toda a linha Trezor: ONE, Model T e Safe 3. Resolução de problemas, atualizações de firmware e configurações avançadas.</p>
+        <span class="service-tag">Trezor Expert</span>
+      </div>
+      <div class="service-card fade-in">
+        <div class="service-icon">❓</div>
+        <h3>Dúvidas Gerais</h3>
+        <p>Tire todas as suas dúvidas sobre hardware wallets, auto-custódia, segurança digital e melhores práticas no mundo cripto.</p>
+        <span class="service-tag">Consultoria</span>
+      </div>
+      <div class="service-card fade-in">
+        <div class="service-icon">🏗️</div>
+        <h3>Planejamento de Custódia</h3>
+        <p>Montagem de estratégia completa de custódia: wallets, backups redundantes, herança digital e plano de contingência.</p>
+        <span class="service-tag">Estratégia</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Curso -->
+<section class="section" id="curso">
+  <div class="container">
+    <div class="section-label">Educação</div>
+    <div class="section-title">Curso Completo de Trezor</div>
+    <div class="section-desc">Aprenda desde o básico até o avançado sobre segurança e custódia de criptomoedas com a Trezor.</div>
+    <div class="curso-banner fade-in">
+      <div class="curso-content">
+        <h3>Maximizando a Segurança de suas Criptomoedas</h3>
+        <p>Curso completo voltado para usuários de Trezor ONE, Trezor T e Trezor Safe 3. Do setup inicial às boas práticas de segurança do dia a dia.</p>
+        <ul class="curso-features">
+          <li>Configuração completa da sua Trezor</li>
+          <li>Transações de envio e recebimento</li>
+          <li>Boas práticas de segurança</li>
+          <li>Backup e recuperação da seed phrase</li>
+          <li>Integração com Metamask e DeFi</li>
+          <li>Suporte e acesso vitalício</li>
+        </ul>
+        <a href="https://hotmart.com/pt-br/marketplace/produtos/seguranca-e-custodia-de-criptoativos/X71241175T" target="_blank" class="btn-primary">
+          Acessar Curso na Hotmart
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </a>
+      </div>
+      <div class="curso-visual">
+        <div class="trezor-icon">🔐</div>
+        <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 8px;">Curso TREZOR</h4>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">Segurança & Custódia de Criptoativos</p>
+        <p class="curso-platform">Disponível na Hotmart</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- YouTube -->
+<section class="section youtube-section" id="youtube">
+  <div class="container">
+    <div class="section-label">Canal</div>
+    <div class="section-title">Conteúdo Gratuito no YouTube</div>
+    <div class="section-desc">Tutoriais, reviews e dicas sobre segurança de criptoativos para todos os níveis.</div>
+    <div class="yt-grid">
+      <div class="yt-visual fade-in">
+        <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" class="yt-play-btn" aria-label="Visitar canal">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </a>
+        <div class="yt-channel-name">Leonardo Scaburi Reinol</div>
+        <div class="yt-channel-handle">@LeonardoScaburiReinol</div>
+        <div class="yt-topics">
+          <span class="yt-topic">Trezor</span>
+          <span class="yt-topic">Hardware Wallet</span>
+          <span class="yt-topic">Bitcoin</span>
+          <span class="yt-topic">Segurança</span>
+          <span class="yt-topic">MetaMask</span>
+          <span class="yt-topic">DeFi</span>
+          <span class="yt-topic">Custódia</span>
+        </div>
+      </div>
+      <div class="yt-text fade-in">
+        <p>No canal você encontra conteúdo gratuito sobre segurança de criptoativos, tutoriais detalhados de hardware wallets, reviews de produtos e análises sobre o mercado cripto.</p>
+        <p>O foco é ensinar de forma clara e acessível como proteger suas criptomoedas, desde o básico para quem está começando até configurações avançadas para usuários experientes.</p>
+        <p>Conteúdo novo toda semana com dicas práticas e alertas de segurança.</p>
+        <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" class="yt-link">
+          Visitar canal no YouTube
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Process -->
+<section class="section" id="processo">
+  <div class="container">
+    <div class="section-label">Como funciona</div>
+    <div class="section-title">Consultoria em 4 passos</div>
+    <div class="section-desc">Processo simples e direto para resolver suas dúvidas sobre segurança de criptoativos.</div>
+    <div class="process-steps">
+      <div class="process-step fade-in">
+        <div class="step-number">01</div>
+        <h4>Entre em contato</h4>
+        <p>Envie uma mensagem pelo formulário ou WhatsApp descrevendo sua necessidade.</p>
+      </div>
+      <div class="process-step fade-in">
+        <div class="step-number">02</div>
+        <h4>Agendamento</h4>
+        <p>Definimos data, horário e plataforma para a consultoria (Google Meet, Zoom, etc).</p>
+      </div>
+      <div class="process-step fade-in">
+        <div class="step-number">03</div>
+        <h4>Consultoria</h4>
+        <p>Sessão ao vivo e personalizada, resolvendo suas dúvidas passo a passo com compartilhamento de tela.</p>
+      </div>
+      <div class="process-step fade-in">
+        <div class="step-number">04</div>
+        <h4>Suporte pós</h4>
+        <p>Acompanhamento posterior para garantir que tudo está funcionando corretamente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="section" id="contato" style="background: var(--bg-card); border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-label">Contato</div>
+    <div class="section-title">Vamos conversar?</div>
+    <div class="section-desc">Entre em contato para agendar sua consultoria ou tirar dúvidas.</div>
+    <div class="contact-grid">
+      <form class="contact-form fade-in" onsubmit="event.preventDefault(); alert('Mensagem enviada! Leonardo entrará em contato em breve.');">
+        <div class="form-group">
+          <label for="name">Nome</label>
+          <input type="text" id="name" placeholder="Seu nome completo" required>
+        </div>
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" placeholder="seu@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="whatsapp">WhatsApp</label>
+          <input type="tel" id="whatsapp" placeholder="(00) 00000-0000">
+        </div>
+        <div class="form-group">
+          <label for="message">Mensagem</label>
+          <textarea id="message" placeholder="Descreva brevemente como posso te ajudar..." required></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="justify-content: center;">
+          Enviar Mensagem
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </form>
+      <div class="contact-info fade-in">
+        <a href="mailto:leoreinol@gmail.com" class="contact-card">
+          <div class="contact-icon">✉️</div>
+          <div>
+            <div class="cc-label">E-mail</div>
+            <div class="cc-value">leoreinol@gmail.com</div>
+          </div>
+        </a>
+        <a href="https://www.instagram.com/leonardoscaburi" target="_blank" class="contact-card">
+          <div class="contact-icon">📸</div>
+          <div>
+            <div class="cc-label">Instagram</div>
+            <div class="cc-value">@leonardoscaburi</div>
+          </div>
+        </a>
+        <a href="https://t.me/LeonardoScaburiReinol" target="_blank" class="contact-card">
+          <div class="contact-icon">✈️</div>
+          <div>
+            <div class="cc-label">Telegram</div>
+            <div class="cc-value">@LeonardoScaburiReinol</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" class="contact-card">
+          <div class="contact-icon">▶️</div>
+          <div>
+            <div class="cc-label">YouTube</div>
+            <div class="cc-value">Leonardo Scaburi Reinol</div>
+          </div>
+        </a>
+        <div class="social-links">
+          <a href="https://www.instagram.com/leonardoscaburi" target="_blank" class="social-link" aria-label="Instagram">📸</a>
+          <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" class="social-link" aria-label="YouTube">▶️</a>
+          <a href="https://t.me/LeonardoScaburiReinol" target="_blank" class="social-link" aria-label="Telegram">✈️</a>
+          <a href="https://x.com/leonardoscaburi" target="_blank" class="social-link" aria-label="X/Twitter">𝕏</a>
+          <a href="https://www.tiktok.com/@leonardoscaburi" target="_blank" class="social-link" aria-label="TikTok">🎵</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Where to Buy -->
+<section class="section" style="padding: 60px 0; text-align: center;">
+  <div class="container">
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">Onde comprar sua hardware wallet com segurança:</p>
+    <a href="https://www.kriptobr.com" target="_blank" style="color: var(--accent-amber); font-weight: 700; font-size: 1.1rem; text-decoration: none; transition: opacity 0.3s;">
+      🛒 KriptoBR — A maior e mais antiga revenda de hardware wallets do mundo
+    </a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2026 Leonardo Scaburi Reinol. Todos os direitos reservados.</p>
+    <div class="kriptobr-badge">
+      Compre sua hardware wallet na <a href="https://www.kriptobr.com" target="_blank">&nbsp;KriptoBR</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Navbar scroll effect
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Fade-in on scroll
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, observerOptions);
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
