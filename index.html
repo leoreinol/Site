@@ -1,759 +1,828 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark" data-lang="pt">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leonardo Scaburi Reinol – Consultoria em Carteiras Físicas de Criptomoedas</title>
-<meta name="description" content="Consultoria especializada em segurança e custódia de criptoativos. Configuração de hardware wallets, recuperação de saldo e suporte Trezor.">
+<meta name="description" content="Consultoria especializada em segurança e custódia de criptoativos. Configuração de hardware wallets, recuperação de saldo e suporte Trezor, Ledger e SecuX.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+/* ═══════════════════════════════════════════
+   RESET & VARIABLES
+   ═══════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-:root {
-  --bg-deep: #0a0e17;
-  --bg-card: #111827;
-  --bg-card-hover: #1a2332;
-  --accent-amber: #f59e0b;
-  --accent-amber-dim: rgba(245, 158, 11, 0.15);
-  --accent-amber-glow: rgba(245, 158, 11, 0.4);
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
+/* ── Dark Theme (default) ── */
+[data-theme="dark"] {
+  --bg-primary: #080b12;
+  --bg-secondary: #0f1320;
+  --bg-card: #141929;
+  --bg-card-hover: #1a2038;
+  --bg-elevated: #1c2237;
+  --accent: #e8a817;
+  --accent-secondary: #c48f12;
+  --accent-dim: rgba(232, 168, 23, 0.12);
+  --accent-glow: rgba(232, 168, 23, 0.35);
+  --text-primary: #edf2f7;
+  --text-secondary: #a0aec0;
   --text-muted: #64748b;
-  --border: rgba(255,255,255,0.06);
-  --border-accent: rgba(245, 158, 11, 0.25);
-  --gradient-gold: linear-gradient(135deg, #f59e0b, #d97706, #b45309);
-  --gradient-dark: linear-gradient(180deg, #0a0e17 0%, #111827 100%);
-  --radius: 16px;
-  --radius-sm: 10px;
-  --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
-  --shadow-glow: 0 0 60px rgba(245, 158, 11, 0.08);
+  --border-color: rgba(255,255,255,0.06);
+  --border-accent: rgba(232, 168, 23, 0.2);
+  --shadow-strong: 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 80px rgba(232, 168, 23, 0.06);
+  --nav-bg: rgba(8, 11, 18, 0.88);
+  --input-bg: #0f1320;
+  --toggle-bg: #1c2237;
+  --toggle-icon: "🌙";
+}
+
+/* ── Light Theme ── */
+[data-theme="light"] {
+  --bg-primary: #f8f9fc;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-elevated: #f1f5f9;
+  --accent: #c47f0a;
+  --accent-secondary: #a66b08;
+  --accent-dim: rgba(196, 127, 10, 0.1);
+  --accent-glow: rgba(196, 127, 10, 0.15);
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --border-color: rgba(0,0,0,0.08);
+  --border-accent: rgba(196, 127, 10, 0.25);
+  --shadow-strong: 0 8px 32px rgba(0,0,0,0.08);
+  --shadow-glow: 0 0 80px rgba(196, 127, 10, 0.04);
+  --nav-bg: rgba(248, 249, 252, 0.92);
+  --input-bg: #f1f5f9;
+  --toggle-bg: #e2e8f0;
+  --toggle-icon: "☀️";
 }
 
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Outfit', sans-serif;
-  background: var(--bg-deep);
+  font-family: 'Sora', sans-serif;
+  background: var(--bg-primary);
   color: var(--text-primary);
-  line-height: 1.6;
+  line-height: 1.65;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.4s, color 0.4s;
 }
 
-/* ── Utility ── */
-.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-.mono { font-family: 'JetBrains Mono', monospace; }
-.sr-only { position: absolute; width: 1px; height: 1px; clip: rect(0,0,0,0); overflow: hidden; }
+.mono { font-family: 'IBM Plex Mono', monospace; }
+.container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 
-/* ── Noise Overlay ── */
-body::before {
+/* ── Noise texture ── */
+body::after {
   content: '';
   position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 9999;
 }
 
-/* ── Navigation ── */
+/* ── i18n: hide non-active languages ── */
+[data-lang="pt"] .lang-en, [data-lang="pt"] .lang-es { display: none !important; }
+[data-lang="en"] .lang-pt, [data-lang="en"] .lang-es { display: none !important; }
+[data-lang="es"] .lang-pt, [data-lang="es"] .lang-en { display: none !important; }
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════ */
 .nav {
   position: fixed; top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 16px 0;
-  transition: background 0.4s, backdrop-filter 0.4s;
+  z-index: 100; padding: 14px 0;
+  transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
 }
 .nav.scrolled {
-  background: rgba(10, 14, 23, 0.85);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  background: var(--nav-bg);
+  backdrop-filter: blur(24px) saturate(1.2);
+  box-shadow: 0 1px 0 var(--border-color);
 }
 .nav-inner {
   display: flex; align-items: center; justify-content: space-between;
-  max-width: 1200px; margin: 0 auto; padding: 0 24px;
+  max-width: 1180px; margin: 0 auto; padding: 0 24px;
 }
 .nav-logo {
-  font-weight: 700; font-size: 1.1rem;
-  color: var(--accent-amber);
-  letter-spacing: -0.02em;
+  font-weight: 700; font-size: 0.95rem;
+  color: var(--text-primary);
   text-decoration: none;
-}
-.nav-logo span { color: var(--text-secondary); font-weight: 400; }
-.nav-links { display: flex; gap: 32px; list-style: none; }
-.nav-links a {
-  color: var(--text-secondary); text-decoration: none;
-  font-size: 0.9rem; font-weight: 500;
+  letter-spacing: -0.02em;
   transition: color 0.3s;
-  position: relative;
 }
-.nav-links a:hover { color: var(--text-primary); }
-.nav-links a::after {
-  content: ''; position: absolute;
-  bottom: -4px; left: 0; width: 0; height: 2px;
-  background: var(--accent-amber);
-  transition: width 0.3s;
+.nav-center { display: flex; align-items: center; gap: 28px; list-style: none; }
+.nav-center a {
+  color: var(--text-secondary); text-decoration: none;
+  font-size: 0.82rem; font-weight: 500;
+  transition: color 0.3s;
 }
-.nav-links a:hover::after { width: 100%; }
-.nav-cta {
-  background: var(--gradient-gold);
-  color: #000 !important; font-weight: 600 !important;
-  padding: 10px 24px; border-radius: 50px;
-  font-size: 0.85rem !important;
+.nav-center a:hover { color: var(--text-primary); }
+
+.nav-right { display: flex; align-items: center; gap: 12px; }
+
+/* Language Switcher */
+.lang-switcher {
+  display: flex; gap: 4px;
+  background: var(--toggle-bg);
+  border-radius: 8px;
+  padding: 3px;
+}
+.lang-btn {
+  background: none; border: none; cursor: pointer;
+  padding: 5px 8px; border-radius: 6px;
+  font-size: 0.92rem; line-height: 1;
+  transition: background 0.3s, transform 0.2s;
+  opacity: 0.5;
+}
+.lang-btn.active { opacity: 1; background: var(--bg-card); }
+.lang-btn:hover { opacity: 1; transform: scale(1.1); }
+
+/* Theme Toggle */
+.theme-toggle {
+  width: 38px; height: 38px;
+  background: var(--toggle-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  transition: background 0.3s, border-color 0.3s, transform 0.3s;
+}
+.theme-toggle:hover { transform: scale(1.08); border-color: var(--accent); }
+
+/* Nav CTA */
+.nav-cta-btn {
+  background: var(--accent);
+  color: #000; font-weight: 600;
+  padding: 9px 22px; border-radius: 50px;
+  font-size: 0.8rem; text-decoration: none;
   transition: transform 0.3s, box-shadow 0.3s;
+  white-space: nowrap;
 }
-.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-amber-glow); }
-.nav-cta::after { display: none !important; }
+.nav-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
 
-.mobile-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
-.mobile-toggle span { display: block; width: 24px; height: 2px; background: var(--text-primary); margin: 5px 0; transition: 0.3s; }
+/* Mobile */
+.mobile-toggle {
+  display: none; background: none; border: none; cursor: pointer;
+  padding: 8px; flex-direction: column; gap: 5px;
+}
+.mobile-toggle span {
+  display: block; width: 22px; height: 2px;
+  background: var(--text-primary);
+  transition: 0.3s;
+  border-radius: 2px;
+}
 
-/* ── Hero ── */
+/* ═══════════════════════════════════════════
+   MOBILE MENU
+   ═══════════════════════════════════════════ */
+.mobile-menu {
+  display: none; position: fixed; inset: 0;
+  background: var(--bg-primary);
+  z-index: 99;
+  flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+  opacity: 0; transition: opacity 0.3s;
+}
+.mobile-menu.open { display: flex; opacity: 1; }
+.mobile-menu a {
+  color: var(--text-primary); text-decoration: none;
+  font-size: 1.15rem; font-weight: 600;
+}
+.mobile-menu .close-btn {
+  position: absolute; top: 18px; right: 24px;
+  background: none; border: none;
+  color: var(--text-primary); font-size: 2rem;
+  cursor: pointer;
+}
+.mobile-menu .mobile-controls {
+  display: flex; gap: 12px; align-items: center; margin-top: 16px;
+}
+
+/* ═══════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════ */
 .hero {
   min-height: 100vh;
   display: flex; align-items: center;
   padding: 120px 0 80px;
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
 }
 .hero::before {
   content: '';
-  position: absolute; top: -50%; right: -30%;
-  width: 800px; height: 800px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero::after {
-  content: '';
-  position: absolute; bottom: -40%; left: -20%;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.04) 0%, transparent 70%);
+  position: absolute; top: -40%; right: -25%;
+  width: 900px; height: 900px;
+  background: radial-gradient(circle, var(--accent-dim) 0%, transparent 65%);
   pointer-events: none;
 }
 .hero-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 80px; align-items: center;
+  display: grid; grid-template-columns: 1fr 420px;
+  gap: 60px; align-items: center;
   position: relative; z-index: 1;
 }
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--accent-amber-dim);
-  border: 1px solid var(--border-accent);
-  padding: 8px 18px; border-radius: 50px;
-  font-size: 0.8rem; font-weight: 500;
-  color: var(--accent-amber);
-  margin-bottom: 28px;
-}
-.hero-badge .dot {
-  width: 6px; height: 6px;
-  background: var(--accent-amber);
-  border-radius: 50%;
-  animation: pulse-dot 2s infinite;
-}
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
 .hero h1 {
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 800;
-  line-height: 1.08;
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+  font-weight: 800; line-height: 1.1;
   letter-spacing: -0.03em;
   margin-bottom: 24px;
 }
 .hero h1 .highlight {
-  background: var(--gradient-gold);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .hero-desc {
-  font-size: 1.15rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: 40px;
+  font-size: 1.1rem; color: var(--text-secondary);
+  line-height: 1.75; margin-bottom: 36px;
   max-width: 520px;
 }
-.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+/* Buttons */
 .btn-primary {
   display: inline-flex; align-items: center; gap: 10px;
-  background: var(--gradient-gold);
-  color: #000; font-weight: 600;
-  padding: 16px 36px; border-radius: 50px;
-  text-decoration: none; font-size: 0.95rem;
-  transition: transform 0.3s, box-shadow 0.3s;
+  background: var(--accent); color: #000; font-weight: 600;
+  padding: 15px 34px; border-radius: 50px;
+  text-decoration: none; font-size: 0.92rem;
   border: none; cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-amber-glow); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
 .btn-secondary {
   display: inline-flex; align-items: center; gap: 10px;
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-color);
   color: var(--text-primary); font-weight: 500;
-  padding: 16px 36px; border-radius: 50px;
-  text-decoration: none; font-size: 0.95rem;
-  transition: border-color 0.3s, background 0.3s;
+  padding: 15px 34px; border-radius: 50px;
+  text-decoration: none; font-size: 0.92rem;
   cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
 }
-.btn-secondary:hover { border-color: var(--accent-amber); background: var(--accent-amber-dim); }
+.btn-secondary:hover { border-color: var(--accent); background: var(--accent-dim); }
+.btn-arrow { width: 16px; height: 16px; }
 
-/* Hero Image */
-.hero-visual {
-  position: relative;
-  display: flex; justify-content: center; align-items: center;
-}
-.hero-img-wrapper {
-  position: relative;
-  width: 380px; height: 380px;
-  border-radius: 32px;
-  overflow: hidden;
+/* Hero Visual */
+.hero-visual { position: relative; display: flex; justify-content: center; }
+.hero-img-wrap {
+  width: 360px; height: 420px;
+  border-radius: 24px; overflow: hidden;
   border: 2px solid var(--border-accent);
   box-shadow: var(--shadow-glow);
+  position: relative;
 }
-.hero-img-wrapper img {
+.hero-img-wrap img {
   width: 100%; height: 100%;
-  object-fit: cover;
-  filter: contrast(1.05);
+  object-fit: cover; object-position: top center;
 }
-.hero-float-card {
+.hero-float {
   position: absolute;
-  background: rgba(17, 24, 39, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(16px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 18px;
   display: flex; align-items: center; gap: 12px;
-  animation: float 6s ease-in-out infinite;
+  box-shadow: var(--shadow-strong);
+  animation: floaty 5s ease-in-out infinite;
 }
-.hero-float-card.top-right {
-  top: -20px; right: -30px;
-  animation-delay: 0s;
-}
-.hero-float-card.bottom-left {
-  bottom: -20px; left: -30px;
-  animation-delay: 3s;
-}
-.float-icon {
-  width: 40px; height: 40px;
-  background: var(--accent-amber-dim);
+.hero-float.card-1 { top: 20px; right: -40px; }
+.hero-float.card-2 { bottom: 30px; left: -40px; animation-delay: 2.5s; }
+.float-ico {
+  width: 38px; height: 38px;
+  background: var(--accent-dim);
   border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
-.float-label { font-size: 0.75rem; color: var(--text-muted); }
-.float-value { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); }
-@keyframes float {
+.float-lbl { font-size: 0.7rem; color: var(--text-muted); }
+.float-val { font-size: 0.88rem; font-weight: 600; }
+
+@keyframes floaty {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-8px); }
 }
 
-/* ── Stats Bar ── */
+/* ═══════════════════════════════════════════
+   STATS BAR
+   ═══════════════════════════════════════════ */
 .stats-bar {
-  padding: 48px 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  padding: 44px 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 .stats-grid {
   display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 32px; text-align: center;
+  gap: 24px; text-align: center;
 }
-.stat-item .stat-number {
-  font-size: 2.2rem; font-weight: 800;
-  color: var(--accent-amber);
+.stat-num {
+  font-size: 2rem; font-weight: 800;
+  color: var(--accent);
   letter-spacing: -0.02em;
 }
-.stat-item .stat-label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+.stat-lbl {
+  font-size: 0.82rem; color: var(--text-muted);
   margin-top: 4px;
 }
 
-/* ── Sections shared ── */
+/* ═══════════════════════════════════════════
+   SECTIONS SHARED
+   ═══════════════════════════════════════════ */
 .section { padding: 100px 0; }
-.section-label {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 0.8rem; font-weight: 600;
-  color: var(--accent-amber);
+.sec-label {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--accent);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-bottom: 16px;
+  letter-spacing: 0.14em;
+  margin-bottom: 14px;
 }
-.section-label::before {
-  content: ''; width: 24px; height: 2px;
-  background: var(--accent-amber);
+.sec-label::before { content: ''; width: 28px; height: 2px; background: var(--accent); }
+.sec-title {
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  font-weight: 800; letter-spacing: -0.03em;
+  line-height: 1.15; margin-bottom: 14px;
 }
-.section-title {
-  font-size: clamp(2rem, 3.5vw, 2.8rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  margin-bottom: 16px;
-}
-.section-desc {
-  font-size: 1.05rem;
-  color: var(--text-secondary);
-  max-width: 600px;
-  line-height: 1.7;
+.sec-desc {
+  font-size: 1rem; color: var(--text-secondary);
+  max-width: 580px; line-height: 1.7;
 }
 
-/* ── About ── */
+/* ═══════════════════════════════════════════
+   ABOUT
+   ═══════════════════════════════════════════ */
 .about-grid {
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: 80px; align-items: center;
-  margin-top: 60px;
+  gap: 70px; align-items: start; margin-top: 56px;
 }
-.about-text p {
-  color: var(--text-secondary);
-  margin-bottom: 20px;
-  line-height: 1.8;
-  font-size: 1.02rem;
-}
+.about-text p { color: var(--text-secondary); margin-bottom: 18px; line-height: 1.8; font-size: 0.98rem; }
 .about-highlights {
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: 16px; margin-top: 32px;
+  gap: 14px; margin-top: 28px;
 }
-.about-highlight {
+.about-hl {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 18px;
   transition: border-color 0.3s;
 }
-.about-highlight:hover { border-color: var(--border-accent); }
-.about-highlight .ah-icon { font-size: 1.5rem; margin-bottom: 10px; }
-.about-highlight .ah-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
-.about-highlight .ah-desc { font-size: 0.8rem; color: var(--text-muted); }
+.about-hl:hover { border-color: var(--border-accent); }
+.about-hl .hl-icon { font-size: 1.3rem; margin-bottom: 8px; }
+.about-hl .hl-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 3px; }
+.about-hl .hl-desc { font-size: 0.78rem; color: var(--text-muted); }
 
 .about-visual {
-  position: relative;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 40px;
-  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 36px;
+  position: relative; overflow: hidden;
 }
 .about-visual::before {
-  content: '';
-  position: absolute; top: 0; right: 0;
-  width: 200px; height: 200px;
-  background: radial-gradient(circle, rgba(245,158,11,0.08), transparent 70%);
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, var(--accent-dim), transparent 70%);
 }
-.timeline-item {
-  display: flex; gap: 20px;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--border);
+.tl-item {
+  display: flex; gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border-color);
   position: relative;
 }
-.timeline-item:last-child { border: none; }
-.timeline-year {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  color: var(--accent-amber);
-  font-weight: 600;
-  min-width: 50px;
+.tl-item:last-child { border: none; }
+.tl-year {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem; color: var(--accent);
+  font-weight: 600; min-width: 46px;
 }
-.timeline-text { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; }
+.tl-text { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
 
-/* ── Services ── */
-.services-grid {
+/* ═══════════════════════════════════════════
+   SERVICES
+   ═══════════════════════════════════════════ */
+.svc-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 24px; margin-top: 60px;
+  gap: 20px; margin-top: 56px;
 }
-.service-card {
+.svc-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 36px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 32px;
   transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
 }
-.service-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--gradient-gold);
-  opacity: 0;
-  transition: opacity 0.3s;
+.svc-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+  opacity: 0; transition: opacity 0.3s;
 }
-.service-card:hover {
+.svc-card:hover {
   transform: translateY(-4px);
   border-color: var(--border-accent);
   box-shadow: var(--shadow-glow);
 }
-.service-card:hover::before { opacity: 1; }
-.service-icon {
-  width: 56px; height: 56px;
-  background: var(--accent-amber-dim);
+.svc-card:hover::before { opacity: 1; }
+.svc-icon {
+  width: 52px; height: 52px;
+  background: var(--accent-dim);
   border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.5rem;
-  margin-bottom: 24px;
+  font-size: 1.3rem; margin-bottom: 20px;
 }
-.service-card h3 {
-  font-size: 1.15rem; font-weight: 700;
-  margin-bottom: 12px;
-  letter-spacing: -0.01em;
-}
-.service-card p {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-.service-tag {
-  display: inline-block;
-  margin-top: 20px;
-  font-size: 0.75rem;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--accent-amber);
-  background: var(--accent-amber-dim);
-  padding: 4px 12px;
-  border-radius: 50px;
+.svc-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+.svc-card p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+.svc-tag {
+  display: inline-block; margin-top: 16px;
+  font-size: 0.7rem; font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent); background: var(--accent-dim);
+  padding: 4px 12px; border-radius: 50px;
 }
 
-/* ── Curso ── */
+/* ═══════════════════════════════════════════
+   COURSES SECTION
+   ═══════════════════════════════════════════ */
 .curso-banner {
   background: var(--bg-card);
   border: 1px solid var(--border-accent);
-  border-radius: var(--radius);
-  padding: 60px;
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 60px; align-items: center;
-  margin-top: 60px;
-  position: relative;
-  overflow: hidden;
+  border-radius: 16px; padding: 52px;
+  display: grid; grid-template-columns: 1.2fr 0.8fr;
+  gap: 50px; align-items: center;
+  margin-top: 56px; position: relative; overflow: hidden;
 }
 .curso-banner::before {
-  content: '';
-  position: absolute; top: -50%; right: -20%;
+  content: ''; position: absolute;
+  top: -50%; right: -15%;
   width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(245,158,11,0.06), transparent 70%);
+  background: radial-gradient(circle, var(--accent-dim), transparent 70%);
 }
 .curso-content h3 {
-  font-size: 1.8rem; font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 16px;
+  font-size: 1.6rem; font-weight: 800;
+  letter-spacing: -0.02em; margin-bottom: 14px;
 }
-.curso-content p {
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: 24px;
-}
-.curso-features {
-  list-style: none;
-  display: flex; flex-direction: column; gap: 12px;
-  margin-bottom: 32px;
-}
+.curso-content p { color: var(--text-secondary); line-height: 1.7; margin-bottom: 22px; }
+.curso-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
 .curso-features li {
   display: flex; align-items: center; gap: 12px;
-  font-size: 0.92rem; color: var(--text-secondary);
+  font-size: 0.88rem; color: var(--text-secondary);
 }
 .curso-features li::before {
-  content: '✓';
-  color: var(--accent-amber);
-  font-weight: 700;
-  width: 24px; height: 24px;
-  background: var(--accent-amber-dim);
+  content: '✓'; color: var(--accent); font-weight: 700;
+  width: 22px; height: 22px;
+  background: var(--accent-dim);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.75rem;
-  flex-shrink: 0;
+  font-size: 0.7rem; flex-shrink: 0;
 }
-.curso-visual {
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 40px;
-  text-align: center;
-  position: relative;
+.curso-visual-box {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 14px; padding: 36px;
+  text-align: center; position: relative;
 }
-.curso-visual .trezor-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 0 30px rgba(245,158,11,0.2));
+.curso-brands {
+  display: flex; justify-content: center; gap: 24px;
+  margin-bottom: 20px; font-size: 2.5rem;
 }
-.curso-visual .curso-platform { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+.curso-stat { font-size: 2rem; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+.curso-stat-label { font-size: 0.85rem; color: var(--text-muted); }
 
-/* ── YouTube ── */
-.youtube-section { background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+/* ═══════════════════════════════════════════
+   YOUTUBE
+   ═══════════════════════════════════════════ */
+.yt-section {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
 .yt-grid {
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: 60px; align-items: center;
-  margin-top: 60px;
+  gap: 56px; align-items: center; margin-top: 56px;
 }
 .yt-visual {
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 40px;
-  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 36px; text-align: center;
 }
-.yt-play-btn {
-  width: 80px; height: 80px;
-  background: #ff0000;
-  border-radius: 50%;
+.yt-play {
+  width: 72px; height: 72px;
+  background: #ff0000; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 24px;
+  margin: 0 auto 20px; cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
+  text-decoration: none;
 }
-.yt-play-btn:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(255,0,0,0.3); }
-.yt-play-btn svg { width: 32px; height: 32px; fill: #fff; margin-left: 4px; }
-.yt-channel-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
-.yt-channel-handle { font-size: 0.85rem; color: var(--text-muted); }
-.yt-topics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; justify-content: center; }
-.yt-topic {
-  font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
+.yt-play:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(255,0,0,0.25); }
+.yt-play svg { width: 28px; height: 28px; fill: #fff; margin-left: 3px; }
+.yt-name { font-weight: 700; font-size: 1.05rem; }
+.yt-handle { font-size: 0.82rem; color: var(--text-muted); }
+.yt-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; justify-content: center; }
+.yt-tag {
+  font-size: 0.7rem; font-family: 'IBM Plex Mono', monospace;
   color: var(--text-secondary);
-  background: rgba(255,255,255,0.05);
-  padding: 6px 14px; border-radius: 50px;
-  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  padding: 5px 12px; border-radius: 50px;
+  border: 1px solid var(--border-color);
 }
-.yt-text p {
-  color: var(--text-secondary);
-  line-height: 1.8; margin-bottom: 20px;
-}
-.yt-text .yt-link {
+.yt-text p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px; font-size: 0.95rem; }
+.yt-link {
   display: inline-flex; align-items: center; gap: 8px;
   color: #ff4444; font-weight: 600;
-  text-decoration: none;
-  transition: gap 0.3s;
+  text-decoration: none; transition: gap 0.3s;
 }
-.yt-text .yt-link:hover { gap: 14px; }
+.yt-link:hover { gap: 14px; }
 
-/* ── Process ── */
-.process-steps {
+/* ═══════════════════════════════════════════
+   PROCESS
+   ═══════════════════════════════════════════ */
+.process-grid {
   display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 24px; margin-top: 60px;
+  gap: 20px; margin-top: 56px;
 }
-.process-step {
+.process-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 36px 28px;
-  text-align: center;
-  position: relative;
-  transition: border-color 0.3s;
+  border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 32px 24px;
+  text-align: center; transition: border-color 0.3s;
 }
-.process-step:hover { border-color: var(--border-accent); }
-.step-number {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 2.5rem; font-weight: 700;
-  color: var(--accent-amber);
-  opacity: 0.3;
-  margin-bottom: 16px;
+.process-card:hover { border-color: var(--border-accent); }
+.step-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 2.2rem; font-weight: 700;
+  color: var(--accent); opacity: 0.3;
+  margin-bottom: 14px;
 }
-.process-step h4 { font-weight: 700; margin-bottom: 10px; font-size: 1rem; }
-.process-step p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+.process-card h4 { font-weight: 700; margin-bottom: 8px; font-size: 0.95rem; }
+.process-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
 
-/* ── Contact ── */
+/* ═══════════════════════════════════════════
+   KRIPTOBR PARTNER
+   ═══════════════════════════════════════════ */
+.partner-section {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+.partner-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 16px; padding: 48px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 48px; align-items: center;
+  margin-top: 40px;
+}
+.partner-text p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px; font-size: 0.95rem; }
+.partner-wallets {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;
+}
+.wallet-badge {
+  font-size: 0.78rem; font-weight: 600;
+  padding: 8px 16px; border-radius: 50px;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+.partner-visual {
+  text-align: center;
+  padding: 32px;
+}
+.partner-logo {
+  max-width: 260px; margin: 0 auto 20px;
+  display: block;
+}
+.partner-tagline { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ═══════════════════════════════════════════
+   CONTACT
+   ═══════════════════════════════════════════ */
 .contact-grid {
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: 60px; margin-top: 60px;
+  gap: 56px; margin-top: 56px;
 }
-.contact-form { display: flex; flex-direction: column; gap: 20px; }
+.contact-form { display: flex; flex-direction: column; gap: 18px; }
 .form-group label {
-  display: block; font-size: 0.85rem; font-weight: 500;
-  color: var(--text-secondary); margin-bottom: 8px;
+  display: block; font-size: 0.82rem; font-weight: 500;
+  color: var(--text-secondary); margin-bottom: 6px;
 }
 .form-group input, .form-group textarea {
   width: 100%;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 18px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 13px 16px;
   color: var(--text-primary);
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.95rem;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.92rem;
   transition: border-color 0.3s, box-shadow 0.3s;
   outline: none;
 }
 .form-group input:focus, .form-group textarea:focus {
-  border-color: var(--accent-amber);
-  box-shadow: 0 0 0 3px var(--accent-amber-dim);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
 }
-.form-group textarea { resize: vertical; min-height: 140px; }
+.form-group textarea { resize: vertical; min-height: 130px; }
+.form-status {
+  padding: 12px 18px; border-radius: 10px;
+  font-size: 0.88rem; font-weight: 500;
+  display: none;
+}
+.form-status.success { display: block; background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+.form-status.error { display: block; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
 
-.contact-info {
-  display: flex; flex-direction: column; gap: 24px;
-}
+.contact-info { display: flex; flex-direction: column; gap: 18px; }
 .contact-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 24px;
-  display: flex; align-items: center; gap: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 20px;
+  display: flex; align-items: center; gap: 16px;
   transition: border-color 0.3s;
   text-decoration: none; color: inherit;
 }
 .contact-card:hover { border-color: var(--border-accent); }
-.contact-icon {
-  width: 52px; height: 52px;
-  background: var(--accent-amber-dim);
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-.contact-card .cc-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2px; }
-.contact-card .cc-value { font-weight: 600; font-size: 0.95rem; }
-
-.social-links {
-  display: flex; gap: 12px; margin-top: 16px;
-}
-.social-link {
+.c-icon {
   width: 48px; height: 48px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--accent-dim);
   border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; flex-shrink: 0;
+}
+.c-label { font-size: 0.75rem; color: var(--text-muted); }
+.c-value { font-weight: 600; font-size: 0.9rem; }
+
+.social-row { display: flex; gap: 10px; margin-top: 12px; }
+.social-ico {
+  width: 44px; height: 44px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
   text-decoration: none; color: var(--text-secondary);
   transition: border-color 0.3s, color 0.3s, background 0.3s;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
-.social-link:hover {
-  border-color: var(--accent-amber);
-  color: var(--accent-amber);
-  background: var(--accent-amber-dim);
-}
+.social-ico:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
-/* ── Footer ── */
+/* ═══════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════ */
 .footer {
-  padding: 40px 0;
-  border-top: 1px solid var(--border);
+  padding: 36px 0;
+  border-top: 1px solid var(--border-color);
   text-align: center;
 }
-.footer p { font-size: 0.85rem; color: var(--text-muted); }
-.footer a { color: var(--accent-amber); text-decoration: none; }
-.footer .kriptobr-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  margin-top: 12px;
-  font-size: 0.8rem; color: var(--text-muted);
-}
+.footer p { font-size: 0.82rem; color: var(--text-muted); }
+.footer a { color: var(--accent); text-decoration: none; }
 
-/* ── Animations ── */
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════ */
 .fade-in {
-  opacity: 0; transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  opacity: 0; transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 .fade-in.visible { opacity: 1; transform: translateY(0); }
 
-/* ── Responsive ── */
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
 @media (max-width: 1024px) {
-  .hero-grid { grid-template-columns: 1fr; gap: 50px; text-align: center; }
-  .hero-desc { margin: 0 auto 40px; }
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+  .hero-desc { margin: 0 auto 36px; }
   .hero-actions { justify-content: center; }
   .hero-visual { order: -1; }
-  .hero-img-wrapper { width: 300px; height: 300px; }
-  .about-grid { grid-template-columns: 1fr; gap: 50px; }
-  .services-grid { grid-template-columns: repeat(2, 1fr); }
-  .curso-banner { grid-template-columns: 1fr; padding: 40px; }
-  .yt-grid { grid-template-columns: 1fr; }
-  .process-steps { grid-template-columns: repeat(2, 1fr); }
-  .contact-grid { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .hero-img-wrap { width: 280px; height: 340px; margin: 0 auto; }
+  .about-grid, .yt-grid, .contact-grid, .partner-box { grid-template-columns: 1fr; }
+  .svc-grid { grid-template-columns: repeat(2, 1fr); }
+  .curso-banner { grid-template-columns: 1fr; padding: 36px; }
+  .process-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .nav-center { display: none; }
+  .nav-cta-btn { display: none; }
+  .mobile-toggle { display: flex; }
 }
 
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  .mobile-toggle { display: block; }
-  .hero { padding: 100px 0 60px; }
-  .hero h1 { font-size: 2.2rem; }
-  .hero-img-wrapper { width: 260px; height: 260px; }
-  .hero-float-card { display: none; }
-  .services-grid { grid-template-columns: 1fr; }
-  .process-steps { grid-template-columns: 1fr; }
+@media (max-width: 640px) {
+  .hero { padding: 100px 0 50px; }
+  .hero h1 { font-size: 2rem; }
+  .hero-img-wrap { width: 240px; height: 300px; }
+  .hero-float { display: none; }
+  .svc-grid { grid-template-columns: 1fr; }
+  .process-grid { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
-  .section { padding: 70px 0; }
-  .curso-banner { padding: 30px; }
-}
-
-/* ── Mobile menu ── */
-.mobile-menu {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(10, 14, 23, 0.95);
-  backdrop-filter: blur(20px);
-  z-index: 99;
-  flex-direction: column; align-items: center; justify-content: center;
-  gap: 32px;
-}
-.mobile-menu.open { display: flex; }
-.mobile-menu a {
-  color: var(--text-primary); text-decoration: none;
-  font-size: 1.3rem; font-weight: 600;
-}
-.mobile-menu .close-menu {
-  position: absolute; top: 20px; right: 24px;
-  background: none; border: none;
-  color: var(--text-primary); font-size: 2rem;
-  cursor: pointer;
+  .section { padding: 64px 0; }
+  .curso-banner { padding: 28px; }
+  .partner-box { padding: 28px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Navigation -->
+<!-- ═══ NAVIGATION ═══ -->
 <nav class="nav" id="navbar">
   <div class="nav-inner">
-    <a href="#" class="nav-logo">SCABURI <span>CRYPTO</span></a>
-    <ul class="nav-links">
-      <li><a href="#sobre">Sobre</a></li>
-      <li><a href="#servicos">Serviços</a></li>
-      <li><a href="#curso">Curso</a></li>
+    <a href="#" class="nav-logo">Leonardo Scaburi Reinol</a>
+    <ul class="nav-center">
+      <li><a href="#sobre" class="lang-pt">Sobre</a><a href="#sobre" class="lang-en">About</a><a href="#sobre" class="lang-es">Acerca</a></li>
+      <li><a href="#servicos" class="lang-pt">Serviços</a><a href="#servicos" class="lang-en">Services</a><a href="#servicos" class="lang-es">Servicios</a></li>
+      <li><a href="#curso" class="lang-pt">Cursos</a><a href="#curso" class="lang-en">Courses</a><a href="#curso" class="lang-es">Cursos</a></li>
       <li><a href="#youtube">YouTube</a></li>
-      <li><a href="#contato" class="nav-cta">Agendar Consultoria</a></li>
+      <li>
+        <a href="#contato" class="nav-cta-btn lang-pt">Agendar Consultoria</a>
+        <a href="#contato" class="nav-cta-btn lang-en">Book Consultation</a>
+        <a href="#contato" class="nav-cta-btn lang-es">Agendar Consultoría</a>
+      </li>
     </ul>
-    <button class="mobile-toggle" onclick="document.getElementById('mobileMenu').classList.add('open')" aria-label="Abrir menu">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="nav-right">
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('pt')" title="Português">🇧🇷</button>
+        <button class="lang-btn" onclick="setLang('en')" title="English">🇺🇸</button>
+        <button class="lang-btn" onclick="setLang('es')" title="Español">🇪🇸</button>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" aria-label="Alternar tema">🌙</button>
+      <button class="mobile-toggle" onclick="document.getElementById('mobileMenu').classList.add('open')" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 </nav>
 
-<!-- Mobile Menu -->
+<!-- ═══ MOBILE MENU ═══ -->
 <div class="mobile-menu" id="mobileMenu">
-  <button class="close-menu" onclick="this.parentElement.classList.remove('open')">&times;</button>
-  <a href="#sobre" onclick="this.parentElement.classList.remove('open')">Sobre</a>
-  <a href="#servicos" onclick="this.parentElement.classList.remove('open')">Serviços</a>
-  <a href="#curso" onclick="this.parentElement.classList.remove('open')">Curso</a>
-  <a href="#youtube" onclick="this.parentElement.classList.remove('open')">YouTube</a>
-  <a href="#contato" onclick="this.parentElement.classList.remove('open')">Agendar Consultoria</a>
+  <button class="close-btn" onclick="this.parentElement.classList.remove('open')">&times;</button>
+  <a href="#sobre" onclick="closeMobile()" class="lang-pt">Sobre</a>
+  <a href="#sobre" onclick="closeMobile()" class="lang-en">About</a>
+  <a href="#sobre" onclick="closeMobile()" class="lang-es">Acerca</a>
+  <a href="#servicos" onclick="closeMobile()" class="lang-pt">Serviços</a>
+  <a href="#servicos" onclick="closeMobile()" class="lang-en">Services</a>
+  <a href="#servicos" onclick="closeMobile()" class="lang-es">Servicios</a>
+  <a href="#curso" onclick="closeMobile()" class="lang-pt">Cursos</a>
+  <a href="#curso" onclick="closeMobile()" class="lang-en">Courses</a>
+  <a href="#curso" onclick="closeMobile()" class="lang-es">Cursos</a>
+  <a href="#youtube" onclick="closeMobile()">YouTube</a>
+  <a href="#contato" onclick="closeMobile()" class="lang-pt">Contato</a>
+  <a href="#contato" onclick="closeMobile()" class="lang-en">Contact</a>
+  <a href="#contato" onclick="closeMobile()" class="lang-es">Contacto</a>
+  <div class="mobile-controls">
+    <div class="lang-switcher">
+      <button class="lang-btn" onclick="setLang('pt')">🇧🇷</button>
+      <button class="lang-btn" onclick="setLang('en')">🇺🇸</button>
+      <button class="lang-btn" onclick="setLang('es')">🇪🇸</button>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
+  </div>
 </div>
 
-<!-- Hero -->
+<!-- ═══ HERO ═══ -->
 <section class="hero" id="inicio">
   <div class="container">
     <div class="hero-grid">
       <div class="hero-content">
-        <div class="hero-badge">
-          <span class="dot"></span>
-          Especialista desde 2014
-        </div>
-        <h1>Segurança e custódia de <span class="highlight">criptoativos</span> sem complicação</h1>
-        <p class="hero-desc">Consultoria personalizada para quem quer proteger suas criptomoedas com carteiras físicas. Da configuração inicial ao suporte avançado.</p>
+        <h1 class="lang-pt">Segurança e <span class="highlight">custódia de Criptoativos</span> sem complicação</h1>
+        <h1 class="lang-en">Crypto asset <span class="highlight">security & custody</span> made simple</h1>
+        <h1 class="lang-es">Seguridad y <span class="highlight">custodia de Criptoactivos</span> sin complicaciones</h1>
+
+        <p class="hero-desc lang-pt">Consultoria personalizada para quem quer proteger suas criptomoedas com carteiras físicas. Da configuração inicial ao suporte avançado com Trezor, Ledger e SecuX.</p>
+        <p class="hero-desc lang-en">Personalized consulting for anyone looking to protect their crypto with hardware wallets. From initial setup to advanced support with Trezor, Ledger, and SecuX.</p>
+        <p class="hero-desc lang-es">Consultoría personalizada para quienes quieren proteger sus criptomonedas con billeteras físicas. Desde la configuración inicial hasta soporte avanzado con Trezor, Ledger y SecuX.</p>
+
         <div class="hero-actions">
           <a href="#contato" class="btn-primary">
-            Agendar Consultoria
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <span class="lang-pt">Agendar Consultoria</span>
+            <span class="lang-en">Book Consultation</span>
+            <span class="lang-es">Agendar Consultoría</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
-          <a href="#servicos" class="btn-secondary">Ver Serviços</a>
+          <a href="#servicos" class="btn-secondary">
+            <span class="lang-pt">Ver Serviços</span>
+            <span class="lang-en">View Services</span>
+            <span class="lang-es">Ver Servicios</span>
+          </a>
         </div>
       </div>
       <div class="hero-visual">
-        <div class="hero-img-wrapper">
-          <img src="https://leonardoscaburi.com.br/wp-content/uploads/2026/03/leonardo-1024x1024.jpg" alt="Leonardo Scaburi Reinol" loading="eager">
+        <div class="hero-img-wrap">
+          <img src="https://raw.githubusercontent.com/leoreinol/Site/main/Pictures/Leonardo.jpg" alt="Leonardo Scaburi Reinol" loading="eager">
         </div>
-        <div class="hero-float-card top-right">
-          <div class="float-icon">🔐</div>
+        <div class="hero-float card-1">
+          <div class="float-ico">🔐</div>
           <div>
-            <div class="float-label">Foco em</div>
-            <div class="float-value">Hardware Wallets</div>
+            <div class="float-lbl lang-pt">Foco em</div>
+            <div class="float-lbl lang-en">Focus</div>
+            <div class="float-lbl lang-es">Enfoque</div>
+            <div class="float-val">Hardware Wallets</div>
           </div>
         </div>
-        <div class="hero-float-card bottom-left">
-          <div class="float-icon">🛡️</div>
+        <div class="hero-float card-2">
+          <div class="float-ico">🛡️</div>
           <div>
-            <div class="float-label">Experiência</div>
-            <div class="float-value">+10 anos em crypto</div>
+            <div class="float-lbl lang-pt">Experiência</div>
+            <div class="float-lbl lang-en">Experience</div>
+            <div class="float-lbl lang-es">Experiencia</div>
+            <div class="float-val lang-pt">+10 anos no mercado de Criptomoedas</div>
+            <div class="float-val lang-en">+10 years in the Crypto market</div>
+            <div class="float-val lang-es">+10 años en el mercado Cripto</div>
           </div>
         </div>
       </div>
@@ -761,198 +830,297 @@ body::before {
   </div>
 </section>
 
-<!-- Stats -->
+<!-- ═══ STATS ═══ -->
 <div class="stats-bar">
   <div class="container">
     <div class="stats-grid">
       <div class="stat-item fade-in">
-        <div class="stat-number">+10</div>
-        <div class="stat-label">Anos no mercado cripto</div>
+        <div class="stat-num">+10</div>
+        <div class="stat-lbl lang-pt">anos no mercado de Criptomoedas</div>
+        <div class="stat-lbl lang-en">years in the Crypto market</div>
+        <div class="stat-lbl lang-es">años en el mercado Cripto</div>
       </div>
       <div class="stat-item fade-in">
-        <div class="stat-number">500+</div>
-        <div class="stat-label">Consultorias realizadas</div>
+        <div class="stat-num">+1000</div>
+        <div class="stat-lbl lang-pt">Consultorias realizadas</div>
+        <div class="stat-lbl lang-en">Consultations completed</div>
+        <div class="stat-lbl lang-es">Consultorías realizadas</div>
       </div>
       <div class="stat-item fade-in">
-        <div class="stat-number">Trezor</div>
-        <div class="stat-label">Especialista certificado</div>
+        <div class="stat-num">200+</div>
+        <div class="stat-lbl lang-pt">Aulas gravadas</div>
+        <div class="stat-lbl lang-en">Recorded lessons</div>
+        <div class="stat-lbl lang-es">Clases grabadas</div>
       </div>
       <div class="stat-item fade-in">
-        <div class="stat-number">100%</div>
-        <div class="stat-label">Online e personalizado</div>
+        <div class="stat-num">100%</div>
+        <div class="stat-lbl lang-pt">Atendimento privado e personalizado</div>
+        <div class="stat-lbl lang-en">Private & personalized service</div>
+        <div class="stat-lbl lang-es">Atención privada y personalizada</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- About -->
+<!-- ═══ ABOUT ═══ -->
 <section class="section" id="sobre">
   <div class="container">
-    <div class="section-label">Sobre mim</div>
-    <div class="section-title">Quem é Leonardo Scaburi?</div>
+    <div class="sec-label lang-pt">Sobre mim</div>
+    <div class="sec-label lang-en">About me</div>
+    <div class="sec-label lang-es">Sobre mí</div>
+
+    <div class="sec-title lang-pt">Quem é Leonardo Scaburi?</div>
+    <div class="sec-title lang-en">Who is Leonardo Scaburi?</div>
+    <div class="sec-title lang-es">¿Quién es Leonardo Scaburi?</div>
+
     <div class="about-grid">
       <div class="about-text fade-in">
-        <p>Sou entusiasta do mercado de criptomoedas desde meados de 2014. Ao longo desses anos, percebi que a maioria das pessoas não sabe tomar o devido cuidado para armazenar de forma correta seus criptoativos.</p>
-        <p>Meu foco é em segurança e custódia — ajudando pessoas comuns a protegerem seus investimentos usando carteiras físicas (hardware wallets) da forma correta, sem complicação e sem risco de perder seus fundos.</p>
-        <p>Além da consultoria individual, produzo conteúdo educativo no YouTube e ofereço um curso completo focado na Trezor, a hardware wallet mais confiável do mercado.</p>
+        <p class="lang-pt">Sou entusiasta do mercado de criptomoedas desde meados de 2014. Ao longo desses anos, percebi que a maioria das pessoas não sabe tomar o devido cuidado para armazenar de forma correta seus criptoativos.</p>
+        <p class="lang-pt">Meu foco é em segurança e custódia — ajudando pessoas comuns a protegerem seus investimentos usando carteiras físicas (hardware wallets) da forma correta, sem complicação e sem risco de perder seus fundos.</p>
+        <p class="lang-pt">Sou colaborador oficial da KriptoBR, a maior e mais antiga revenda de hardware wallets do mundo, onde sou responsável pelos cursos de Trezor, Ledger e SecuX com mais de 200 aulas gravadas e conteúdo sempre atualizado.</p>
+
+        <p class="lang-en">I've been passionate about the cryptocurrency market since mid-2014. Over the years, I realized that most people don't know how to properly secure their crypto assets.</p>
+        <p class="lang-en">My focus is on security and custody — helping everyday people protect their investments using hardware wallets the right way, without complexity or risk of losing funds.</p>
+        <p class="lang-en">I'm an official collaborator at KriptoBR, the world's largest and oldest hardware wallet reseller, where I'm responsible for the Trezor, Ledger, and SecuX courses with over 200 recorded lessons and always up-to-date content.</p>
+
+        <p class="lang-es">Soy entusiasta del mercado de criptomonedas desde mediados de 2014. A lo largo de estos años, noté que la mayoría de las personas no sabe cómo almacenar correctamente sus criptoactivos.</p>
+        <p class="lang-es">Mi enfoque está en seguridad y custodia — ayudando a personas comunes a proteger sus inversiones usando billeteras físicas (hardware wallets) de forma correcta, sin complicaciones y sin riesgo de perder fondos.</p>
+        <p class="lang-es">Soy colaborador oficial de KriptoBR, la mayor y más antigua reventa de hardware wallets del mundo, donde soy responsable de los cursos de Trezor, Ledger y SecuX con más de 200 clases grabadas y contenido siempre actualizado.</p>
+
         <div class="about-highlights">
-          <div class="about-highlight">
-            <div class="ah-icon">🎓</div>
-            <div class="ah-title">Formação</div>
-            <div class="ah-desc">UFSC – Administração</div>
+          <div class="about-hl">
+            <div class="hl-icon">🎓</div>
+            <div class="hl-title lang-pt">Formação</div><div class="hl-title lang-en">Education</div><div class="hl-title lang-es">Formación</div>
+            <div class="hl-desc">UFSC – Administração</div>
           </div>
-          <div class="about-highlight">
-            <div class="ah-icon">📍</div>
-            <div class="ah-title">Localização</div>
-            <div class="ah-desc">Florianópolis, SC</div>
+          <div class="about-hl">
+            <div class="hl-icon">📍</div>
+            <div class="hl-title lang-pt">Localização</div><div class="hl-title lang-en">Location</div><div class="hl-title lang-es">Ubicación</div>
+            <div class="hl-desc">Florianópolis, SC, Brasil</div>
           </div>
-          <div class="about-highlight">
-            <div class="ah-icon">🎯</div>
-            <div class="ah-title">Foco</div>
-            <div class="ah-desc">Segurança & Custódia</div>
+          <div class="about-hl">
+            <div class="hl-icon">🎯</div>
+            <div class="hl-title lang-pt">Foco</div><div class="hl-title lang-en">Focus</div><div class="hl-title lang-es">Enfoque</div>
+            <div class="hl-desc lang-pt">Segurança & Custódia</div><div class="hl-desc lang-en">Security & Custody</div><div class="hl-desc lang-es">Seguridad & Custodia</div>
           </div>
-          <div class="about-highlight">
-            <div class="ah-icon">📺</div>
-            <div class="ah-title">YouTube</div>
-            <div class="ah-desc">Conteúdo gratuito</div>
+          <div class="about-hl">
+            <div class="hl-icon">🤝</div>
+            <div class="hl-title lang-pt">Parceiro</div><div class="hl-title lang-en">Partner</div><div class="hl-title lang-es">Socio</div>
+            <div class="hl-desc lang-pt">Colaborador KriptoBR</div><div class="hl-desc lang-en">KriptoBR Collaborator</div><div class="hl-desc lang-es">Colaborador KriptoBR</div>
           </div>
         </div>
       </div>
       <div class="about-visual fade-in">
-        <div class="timeline-item">
-          <div class="timeline-year">2014</div>
-          <div class="timeline-text">Início no mercado de criptomoedas. Estudos sobre Bitcoin, blockchain e segurança digital.</div>
+        <div class="tl-item">
+          <div class="tl-year">2014</div>
+          <div class="tl-text lang-pt">Início no mercado de criptomoedas. Estudos sobre Bitcoin, blockchain e segurança digital.</div>
+          <div class="tl-text lang-en">Started in the crypto market. Studies on Bitcoin, blockchain, and digital security.</div>
+          <div class="tl-text lang-es">Inicio en el mercado cripto. Estudios sobre Bitcoin, blockchain y seguridad digital.</div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2018</div>
-          <div class="timeline-text">Primeira hardware wallet adquirida. Percepção da importância da auto-custódia.</div>
+        <div class="tl-item">
+          <div class="tl-year">2018</div>
+          <div class="tl-text lang-pt">Primeira hardware wallet adquirida. Início da jornada em auto-custódia.</div>
+          <div class="tl-text lang-en">First hardware wallet acquired. Self-custody journey begins.</div>
+          <div class="tl-text lang-es">Primera hardware wallet adquirida. Inicio del camino hacia la auto-custodia.</div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2020</div>
-          <div class="timeline-text">Criação do canal no YouTube focado em segurança de criptoativos e tutoriais de hardware wallets.</div>
+        <div class="tl-item">
+          <div class="tl-year">2020</div>
+          <div class="tl-text lang-pt">Criação do canal no YouTube focado em segurança de criptoativos e tutoriais.</div>
+          <div class="tl-text lang-en">YouTube channel created, focused on crypto security and tutorials.</div>
+          <div class="tl-text lang-es">Creación del canal de YouTube enfocado en seguridad cripto y tutoriales.</div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2023</div>
-          <div class="timeline-text">Lançamento do curso completo de Trezor na Hotmart. Início das consultorias individuais.</div>
+        <div class="tl-item">
+          <div class="tl-year">2023</div>
+          <div class="tl-text lang-pt">Lançamento dos cursos de Trezor e Segurança na KriptoBR. Início das consultorias.</div>
+          <div class="tl-text lang-en">Launch of Trezor and Security courses at KriptoBR. Consulting begins.</div>
+          <div class="tl-text lang-es">Lanzamiento de cursos de Trezor y Seguridad en KriptoBR. Inicio de consultorías.</div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2026</div>
-          <div class="timeline-text">Centenas de consultorias realizadas. Referência em segurança de criptoativos no Brasil.</div>
+        <div class="tl-item">
+          <div class="tl-year">2026</div>
+          <div class="tl-text lang-pt">+1000 consultorias realizadas. Responsável por 3 cursos oficiais na KriptoBR: Trezor, Ledger e SecuX.</div>
+          <div class="tl-text lang-en">1000+ consultations completed. Responsible for 3 official KriptoBR courses: Trezor, Ledger, and SecuX.</div>
+          <div class="tl-text lang-es">+1000 consultorías realizadas. Responsable de 3 cursos oficiales en KriptoBR: Trezor, Ledger y SecuX.</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Services -->
-<section class="section" id="servicos" style="background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+<!-- ═══ SERVICES ═══ -->
+<section class="section" id="servicos" style="background: var(--bg-secondary); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
   <div class="container">
-    <div class="section-label">Serviços</div>
-    <div class="section-title">Consultoria Especializada</div>
-    <div class="section-desc">Atendimento personalizado e individual para resolver qualquer dúvida ou problema com suas carteiras físicas de criptomoedas.</div>
-    <div class="services-grid">
-      <div class="service-card fade-in">
-        <div class="service-icon">⚙️</div>
-        <h3>Configurar Carteira</h3>
-        <p>Configuração completa da sua hardware wallet do zero. Setup inicial, criação segura da seed phrase, backup e boas práticas de segurança.</p>
-        <span class="service-tag">Setup Completo</span>
+    <div class="sec-label lang-pt">Serviços</div><div class="sec-label lang-en">Services</div><div class="sec-label lang-es">Servicios</div>
+    <div class="sec-title lang-pt">Consultoria Especializada</div><div class="sec-title lang-en">Specialized Consulting</div><div class="sec-title lang-es">Consultoría Especializada</div>
+    <div class="sec-desc lang-pt">Atendimento 100% privado, personalizado e individual para resolver qualquer problema com suas carteiras físicas de criptomoedas.</div>
+    <div class="sec-desc lang-en">100% private, personalized, and individual service to solve any issue with your cryptocurrency hardware wallets.</div>
+    <div class="sec-desc lang-es">Atención 100% privada, personalizada e individual para resolver cualquier problema con sus billeteras físicas de criptomonedas.</div>
+
+    <div class="svc-grid">
+      <div class="svc-card fade-in">
+        <div class="svc-icon">⚙️</div>
+        <h3 class="lang-pt">Configurar Carteira</h3><h3 class="lang-en">Wallet Setup</h3><h3 class="lang-es">Configurar Billetera</h3>
+        <p class="lang-pt">Configuração completa da sua hardware wallet do zero. Setup inicial, criação segura da seed phrase, backup e boas práticas de segurança.</p>
+        <p class="lang-en">Complete hardware wallet setup from scratch. Initial setup, secure seed phrase creation, backup, and security best practices.</p>
+        <p class="lang-es">Configuración completa de su hardware wallet desde cero. Setup inicial, creación segura de la seed phrase, backup y buenas prácticas.</p>
+        <span class="svc-tag">Setup</span>
       </div>
-      <div class="service-card fade-in">
-        <div class="service-icon">💰</div>
-        <h3>Recuperar Saldo</h3>
-        <p>Recuperação de acesso a criptoativos em carteiras que você não consegue acessar. Restauração de seed, migração entre dispositivos.</p>
-        <span class="service-tag">Recuperação</span>
+      <div class="svc-card fade-in">
+        <div class="svc-icon">💰</div>
+        <h3 class="lang-pt">Recuperar Saldo</h3><h3 class="lang-en">Balance Recovery</h3><h3 class="lang-es">Recuperar Saldo</h3>
+        <p class="lang-pt">Recuperação de acesso a criptoativos em carteiras que você não consegue acessar. Restauração de seed, migração entre dispositivos.</p>
+        <p class="lang-en">Recover access to crypto assets in wallets you can't access. Seed restoration, migration between devices.</p>
+        <p class="lang-es">Recuperación de acceso a criptoactivos en billeteras inaccesibles. Restauración de seed, migración entre dispositivos.</p>
+        <span class="svc-tag lang-pt">Recuperação</span><span class="svc-tag lang-en">Recovery</span><span class="svc-tag lang-es">Recuperación</span>
       </div>
-      <div class="service-card fade-in">
-        <div class="service-icon">📤</div>
-        <h3>Enviar Criptoativos</h3>
-        <p>Suporte passo a passo para enviar e receber criptomoedas com segurança usando sua hardware wallet. Evite erros irreversíveis.</p>
-        <span class="service-tag">Transações</span>
+      <div class="svc-card fade-in">
+        <div class="svc-icon">📤</div>
+        <h3 class="lang-pt">Enviar Criptoativos</h3><h3 class="lang-en">Send Crypto Assets</h3><h3 class="lang-es">Enviar Criptoactivos</h3>
+        <p class="lang-pt">Suporte passo a passo para enviar e receber criptomoedas com segurança usando sua hardware wallet. Evite erros irreversíveis.</p>
+        <p class="lang-en">Step-by-step support to send and receive crypto safely using your hardware wallet. Avoid irreversible mistakes.</p>
+        <p class="lang-es">Soporte paso a paso para enviar y recibir cripto de forma segura con su hardware wallet. Evite errores irreversibles.</p>
+        <span class="svc-tag lang-pt">Transações</span><span class="svc-tag lang-en">Transactions</span><span class="svc-tag lang-es">Transacciones</span>
       </div>
-      <div class="service-card fade-in">
-        <div class="service-icon">🔧</div>
-        <h3>Suporte Trezor</h3>
-        <p>Especialista em toda a linha Trezor: ONE, Model T e Safe 3. Resolução de problemas, atualizações de firmware e configurações avançadas.</p>
-        <span class="service-tag">Trezor Expert</span>
+      <div class="svc-card fade-in">
+        <div class="svc-icon">🔧</div>
+        <h3 class="lang-pt">Suporte Trezor, Ledger & SecuX</h3><h3 class="lang-en">Trezor, Ledger & SecuX Support</h3><h3 class="lang-es">Soporte Trezor, Ledger & SecuX</h3>
+        <p class="lang-pt">Especialista nas principais marcas do mercado. Resolução de problemas, atualizações de firmware e configurações avançadas.</p>
+        <p class="lang-en">Expert on the market's leading brands. Troubleshooting, firmware updates, and advanced configurations.</p>
+        <p class="lang-es">Especialista en las principales marcas del mercado. Resolución de problemas, actualizaciones de firmware y configuraciones avanzadas.</p>
+        <span class="svc-tag">Expert</span>
       </div>
-      <div class="service-card fade-in">
-        <div class="service-icon">❓</div>
-        <h3>Dúvidas Gerais</h3>
-        <p>Tire todas as suas dúvidas sobre hardware wallets, auto-custódia, segurança digital e melhores práticas no mundo cripto.</p>
-        <span class="service-tag">Consultoria</span>
+      <div class="svc-card fade-in">
+        <div class="svc-icon">❓</div>
+        <h3 class="lang-pt">Dúvidas Gerais</h3><h3 class="lang-en">General Questions</h3><h3 class="lang-es">Dudas Generales</h3>
+        <p class="lang-pt">Tire todas as suas dúvidas sobre hardware wallets, auto-custódia, segurança digital e melhores práticas no mundo cripto.</p>
+        <p class="lang-en">Get all your questions answered about hardware wallets, self-custody, digital security, and crypto best practices.</p>
+        <p class="lang-es">Resuelva todas sus dudas sobre hardware wallets, auto-custodia, seguridad digital y mejores prácticas cripto.</p>
+        <span class="svc-tag lang-pt">Consultoria</span><span class="svc-tag lang-en">Consulting</span><span class="svc-tag lang-es">Consultoría</span>
       </div>
-      <div class="service-card fade-in">
-        <div class="service-icon">🏗️</div>
-        <h3>Planejamento de Custódia</h3>
-        <p>Montagem de estratégia completa de custódia: wallets, backups redundantes, herança digital e plano de contingência.</p>
-        <span class="service-tag">Estratégia</span>
+      <div class="svc-card fade-in">
+        <div class="svc-icon">🏗️</div>
+        <h3 class="lang-pt">Planejamento de Custódia</h3><h3 class="lang-en">Custody Planning</h3><h3 class="lang-es">Planificación de Custodia</h3>
+        <p class="lang-pt">Montagem de estratégia completa de custódia: wallets, backups redundantes, herança digital e plano de contingência.</p>
+        <p class="lang-en">Complete custody strategy: wallets, redundant backups, digital inheritance, and contingency planning.</p>
+        <p class="lang-es">Estrategia completa de custodia: wallets, backups redundantes, herencia digital y plan de contingencia.</p>
+        <span class="svc-tag lang-pt">Estratégia</span><span class="svc-tag lang-en">Strategy</span><span class="svc-tag lang-es">Estrategia</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Curso -->
+<!-- ═══ COURSES ═══ -->
 <section class="section" id="curso">
   <div class="container">
-    <div class="section-label">Educação</div>
-    <div class="section-title">Curso Completo de Trezor</div>
-    <div class="section-desc">Aprenda desde o básico até o avançado sobre segurança e custódia de criptomoedas com a Trezor.</div>
+    <div class="sec-label lang-pt">Educação</div><div class="sec-label lang-en">Education</div><div class="sec-label lang-es">Educación</div>
+    <div class="sec-title lang-pt">Cursos Oficiais KriptoBR</div><div class="sec-title lang-en">Official KriptoBR Courses</div><div class="sec-title lang-es">Cursos Oficiales KriptoBR</div>
+    <div class="sec-desc lang-pt">Responsável por todos os cursos de hardware wallets da KriptoBR, com mais de 200 aulas gravadas e conteúdo sempre atualizado.</div>
+    <div class="sec-desc lang-en">Responsible for all KriptoBR hardware wallet courses, with over 200 recorded lessons and always up-to-date content.</div>
+    <div class="sec-desc lang-es">Responsable de todos los cursos de hardware wallets de KriptoBR, con más de 200 clases grabadas y contenido siempre actualizado.</div>
+
     <div class="curso-banner fade-in">
       <div class="curso-content">
-        <h3>Maximizando a Segurança de suas Criptomoedas</h3>
-        <p>Curso completo voltado para usuários de Trezor ONE, Trezor T e Trezor Safe 3. Do setup inicial às boas práticas de segurança do dia a dia.</p>
+        <h3 class="lang-pt">Trezor, Ledger e SecuX — Do básico ao avançado</h3>
+        <h3 class="lang-en">Trezor, Ledger & SecuX — From basics to advanced</h3>
+        <h3 class="lang-es">Trezor, Ledger y SecuX — De lo básico a lo avanzado</h3>
+
+        <p class="lang-pt">Cursos completos voltados para usuários de todos os níveis. Aprenda a configurar, usar e proteger seus criptoativos com as principais hardware wallets do mercado.</p>
+        <p class="lang-en">Complete courses for users of all levels. Learn to set up, use, and protect your crypto assets with the market's leading hardware wallets.</p>
+        <p class="lang-es">Cursos completos para usuarios de todos los niveles. Aprenda a configurar, usar y proteger sus criptoactivos con las principales hardware wallets del mercado.</p>
+
         <ul class="curso-features">
-          <li>Configuração completa da sua Trezor</li>
-          <li>Transações de envio e recebimento</li>
-          <li>Boas práticas de segurança</li>
-          <li>Backup e recuperação da seed phrase</li>
-          <li>Integração com Metamask e DeFi</li>
-          <li>Suporte e acesso vitalício</li>
+          <li class="lang-pt">Configuração completa de Trezor, Ledger e SecuX</li>
+          <li class="lang-en">Complete Trezor, Ledger & SecuX setup</li>
+          <li class="lang-es">Configuración completa de Trezor, Ledger y SecuX</li>
+
+          <li class="lang-pt">Transações de envio e recebimento seguras</li>
+          <li class="lang-en">Safe send and receive transactions</li>
+          <li class="lang-es">Transacciones seguras de envío y recepción</li>
+
+          <li class="lang-pt">Backup e recuperação da seed phrase</li>
+          <li class="lang-en">Seed phrase backup and recovery</li>
+          <li class="lang-es">Backup y recuperación de la seed phrase</li>
+
+          <li class="lang-pt">Integração com MetaMask e DeFi</li>
+          <li class="lang-en">MetaMask and DeFi integration</li>
+          <li class="lang-es">Integración con MetaMask y DeFi</li>
+
+          <li class="lang-pt">Mais de 200 aulas com conteúdo atualizado</li>
+          <li class="lang-en">Over 200 lessons with updated content</li>
+          <li class="lang-es">Más de 200 clases con contenido actualizado</li>
+
+          <li class="lang-pt">Acesso através da plataforma KriptoBR</li>
+          <li class="lang-en">Access through the KriptoBR platform</li>
+          <li class="lang-es">Acceso a través de la plataforma KriptoBR</li>
         </ul>
-        <a href="https://hotmart.com/pt-br/marketplace/produtos/seguranca-e-custodia-de-criptoativos/X71241175T" target="_blank" class="btn-primary">
-          Acessar Curso na Hotmart
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        <a href="https://www.kriptobr.com" target="_blank" class="btn-primary">
+          <span class="lang-pt">Acessar Cursos na KriptoBR</span>
+          <span class="lang-en">Access Courses at KriptoBR</span>
+          <span class="lang-es">Acceder a los Cursos en KriptoBR</span>
+          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
         </a>
       </div>
-      <div class="curso-visual">
-        <div class="trezor-icon">🔐</div>
-        <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 8px;">Curso TREZOR</h4>
-        <p style="color: var(--text-secondary); font-size: 0.95rem;">Segurança & Custódia de Criptoativos</p>
-        <p class="curso-platform">Disponível na Hotmart</p>
+      <div class="curso-visual-box">
+        <div class="curso-brands">🔐 🛡️ ⚡</div>
+        <div class="curso-stat">200+</div>
+        <div class="curso-stat-label lang-pt">Aulas gravadas</div>
+        <div class="curso-stat-label lang-en">Recorded lessons</div>
+        <div class="curso-stat-label lang-es">Clases grabadas</div>
+        <div style="display: flex; justify-content: center; gap: 16px; margin-top: 24px; flex-wrap: wrap;">
+          <span class="svc-tag" style="font-size: 0.82rem; padding: 6px 16px;">Trezor</span>
+          <span class="svc-tag" style="font-size: 0.82rem; padding: 6px 16px;">Ledger</span>
+          <span class="svc-tag" style="font-size: 0.82rem; padding: 6px 16px;">SecuX</span>
+        </div>
+        <p class="curso-stat-label" style="margin-top: 20px;">
+          <span class="lang-pt">Disponível na KriptoBR</span>
+          <span class="lang-en">Available at KriptoBR</span>
+          <span class="lang-es">Disponible en KriptoBR</span>
+        </p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- YouTube -->
-<section class="section youtube-section" id="youtube">
+<!-- ═══ YOUTUBE ═══ -->
+<section class="section yt-section" id="youtube">
   <div class="container">
-    <div class="section-label">Canal</div>
-    <div class="section-title">Conteúdo Gratuito no YouTube</div>
-    <div class="section-desc">Tutoriais, reviews e dicas sobre segurança de criptoativos para todos os níveis.</div>
+    <div class="sec-label lang-pt">Canal</div><div class="sec-label lang-en">Channel</div><div class="sec-label lang-es">Canal</div>
+    <div class="sec-title lang-pt">Conteúdo Gratuito no YouTube</div><div class="sec-title lang-en">Free Content on YouTube</div><div class="sec-title lang-es">Contenido Gratuito en YouTube</div>
+    <div class="sec-desc lang-pt">Tutoriais, reviews e dicas sobre segurança de criptoativos para todos os níveis.</div>
+    <div class="sec-desc lang-en">Tutorials, reviews, and tips on crypto security for all levels.</div>
+    <div class="sec-desc lang-es">Tutoriales, reviews y consejos sobre seguridad cripto para todos los niveles.</div>
+
     <div class="yt-grid">
       <div class="yt-visual fade-in">
-        <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" class="yt-play-btn" aria-label="Visitar canal">
+        <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" rel="noopener" class="yt-play" aria-label="YouTube">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </a>
-        <div class="yt-channel-name">Leonardo Scaburi Reinol</div>
-        <div class="yt-channel-handle">@LeonardoScaburiReinol</div>
-        <div class="yt-topics">
-          <span class="yt-topic">Trezor</span>
-          <span class="yt-topic">Hardware Wallet</span>
-          <span class="yt-topic">Bitcoin</span>
-          <span class="yt-topic">Segurança</span>
-          <span class="yt-topic">MetaMask</span>
-          <span class="yt-topic">DeFi</span>
-          <span class="yt-topic">Custódia</span>
+        <div class="yt-name">Leonardo Scaburi Reinol</div>
+        <div class="yt-handle">@LeonardoScaburiReinol</div>
+        <div class="yt-tags">
+          <span class="yt-tag">Trezor</span>
+          <span class="yt-tag">Ledger</span>
+          <span class="yt-tag">SecuX</span>
+          <span class="yt-tag">Bitcoin</span>
+          <span class="yt-tag lang-pt">Segurança</span><span class="yt-tag lang-en">Security</span><span class="yt-tag lang-es">Seguridad</span>
+          <span class="yt-tag">MetaMask</span>
+          <span class="yt-tag">DeFi</span>
+          <span class="yt-tag lang-pt">Custódia</span><span class="yt-tag lang-en">Custody</span><span class="yt-tag lang-es">Custodia</span>
         </div>
       </div>
       <div class="yt-text fade-in">
-        <p>No canal você encontra conteúdo gratuito sobre segurança de criptoativos, tutoriais detalhados de hardware wallets, reviews de produtos e análises sobre o mercado cripto.</p>
-        <p>O foco é ensinar de forma clara e acessível como proteger suas criptomoedas, desde o básico para quem está começando até configurações avançadas para usuários experientes.</p>
-        <p>Conteúdo novo toda semana com dicas práticas e alertas de segurança.</p>
-        <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" class="yt-link">
-          Visitar canal no YouTube
+        <p class="lang-pt">No canal você encontra conteúdo gratuito sobre segurança de criptoativos, tutoriais detalhados de hardware wallets, reviews de produtos e análises sobre o mercado cripto.</p>
+        <p class="lang-pt">O foco é ensinar de forma clara e acessível como proteger suas criptomoedas, desde o básico para quem está começando até configurações avançadas para usuários experientes.</p>
+
+        <p class="lang-en">On the channel you'll find free content about crypto security, detailed hardware wallet tutorials, product reviews, and market analysis.</p>
+        <p class="lang-en">The focus is teaching clearly and accessibly how to protect your crypto, from basics for beginners to advanced configurations for experienced users.</p>
+
+        <p class="lang-es">En el canal encontrarás contenido gratuito sobre seguridad cripto, tutoriales detallados de hardware wallets, reviews de productos y análisis del mercado.</p>
+        <p class="lang-es">El enfoque es enseñar de forma clara y accesible cómo proteger tus criptomonedas, desde lo básico hasta configuraciones avanzadas.</p>
+
+        <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" rel="noopener" class="yt-link">
+          <span class="lang-pt">Visitar canal no YouTube</span>
+          <span class="lang-en">Visit YouTube channel</span>
+          <span class="lang-es">Visitar canal en YouTube</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
@@ -960,152 +1128,317 @@ body::before {
   </div>
 </section>
 
-<!-- Process -->
+<!-- ═══ PROCESS ═══ -->
 <section class="section" id="processo">
   <div class="container">
-    <div class="section-label">Como funciona</div>
-    <div class="section-title">Consultoria em 4 passos</div>
-    <div class="section-desc">Processo simples e direto para resolver suas dúvidas sobre segurança de criptoativos.</div>
-    <div class="process-steps">
-      <div class="process-step fade-in">
-        <div class="step-number">01</div>
-        <h4>Entre em contato</h4>
-        <p>Envie uma mensagem pelo formulário ou WhatsApp descrevendo sua necessidade.</p>
+    <div class="sec-label lang-pt">Como funciona</div><div class="sec-label lang-en">How it works</div><div class="sec-label lang-es">Cómo funciona</div>
+    <div class="sec-title lang-pt">Consultoria em 4 passos</div><div class="sec-title lang-en">Consulting in 4 steps</div><div class="sec-title lang-es">Consultoría en 4 pasos</div>
+
+    <div class="process-grid">
+      <div class="process-card fade-in">
+        <div class="step-num">01</div>
+        <h4 class="lang-pt">Entre em contato</h4><h4 class="lang-en">Get in touch</h4><h4 class="lang-es">Contáctenos</h4>
+        <p class="lang-pt">Envie uma mensagem pelo formulário, e-mail ou Instagram descrevendo sua necessidade.</p>
+        <p class="lang-en">Send a message via the form, email, or Instagram describing your needs.</p>
+        <p class="lang-es">Envíe un mensaje por formulario, email o Instagram describiendo su necesidad.</p>
       </div>
-      <div class="process-step fade-in">
-        <div class="step-number">02</div>
-        <h4>Agendamento</h4>
-        <p>Definimos data, horário e plataforma para a consultoria (Google Meet, Zoom, etc).</p>
+      <div class="process-card fade-in">
+        <div class="step-num">02</div>
+        <h4 class="lang-pt">Agendamento</h4><h4 class="lang-en">Scheduling</h4><h4 class="lang-es">Agendamiento</h4>
+        <p class="lang-pt">Definimos data, horário e plataforma para a consultoria (Google Meet, Zoom, etc).</p>
+        <p class="lang-en">We set the date, time, and platform for the consultation (Google Meet, Zoom, etc).</p>
+        <p class="lang-es">Definimos fecha, horario y plataforma para la consultoría (Google Meet, Zoom, etc).</p>
       </div>
-      <div class="process-step fade-in">
-        <div class="step-number">03</div>
-        <h4>Consultoria</h4>
-        <p>Sessão ao vivo e personalizada, resolvendo suas dúvidas passo a passo com compartilhamento de tela.</p>
+      <div class="process-card fade-in">
+        <div class="step-num">03</div>
+        <h4 class="lang-pt">Consultoria</h4><h4 class="lang-en">Consultation</h4><h4 class="lang-es">Consultoría</h4>
+        <p class="lang-pt">Sessão ao vivo, privada e personalizada, resolvendo suas dúvidas passo a passo com compartilhamento de tela.</p>
+        <p class="lang-en">Live, private, personalized session solving your questions step-by-step with screen sharing.</p>
+        <p class="lang-es">Sesión en vivo, privada y personalizada, resolviendo sus dudas paso a paso con pantalla compartida.</p>
       </div>
-      <div class="process-step fade-in">
-        <div class="step-number">04</div>
-        <h4>Suporte pós</h4>
-        <p>Acompanhamento posterior para garantir que tudo está funcionando corretamente.</p>
+      <div class="process-card fade-in">
+        <div class="step-num">04</div>
+        <h4 class="lang-pt">Suporte pós</h4><h4 class="lang-en">Follow-up</h4><h4 class="lang-es">Soporte post</h4>
+        <p class="lang-pt">Acompanhamento posterior para garantir que tudo está funcionando corretamente.</p>
+        <p class="lang-en">Follow-up support to ensure everything is working correctly.</p>
+        <p class="lang-es">Acompañamiento posterior para garantizar que todo funcione correctamente.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Contact -->
-<section class="section" id="contato" style="background: var(--bg-card); border-top: 1px solid var(--border);">
+<!-- ═══ KRIPTOBR PARTNER ═══ -->
+<section class="section partner-section" id="parceiro">
   <div class="container">
-    <div class="section-label">Contato</div>
-    <div class="section-title">Vamos conversar?</div>
-    <div class="section-desc">Entre em contato para agendar sua consultoria ou tirar dúvidas.</div>
+    <div class="sec-label lang-pt">Parceria</div><div class="sec-label lang-en">Partnership</div><div class="sec-label lang-es">Alianza</div>
+    <div class="sec-title lang-pt">Colaborador Oficial KriptoBR</div><div class="sec-title lang-en">Official KriptoBR Collaborator</div><div class="sec-title lang-es">Colaborador Oficial KriptoBR</div>
+
+    <div class="partner-box fade-in">
+      <div>
+        <p class="lang-pt">A KriptoBR é a maior e mais antiga revenda de hardware wallets do mundo, oferecendo produtos originais da Trezor, Ledger, SecuX, Yubico e muito mais com garantia, suporte em português e entrega para todo o Brasil.</p>
+        <p class="lang-pt">Como colaborador oficial, sou responsável pela criação e atualização de todos os cursos de hardware wallets da plataforma, ajudando milhares de pessoas a utilizarem seus dispositivos da forma mais segura possível.</p>
+
+        <p class="lang-en">KriptoBR is the world's largest and oldest hardware wallet reseller, offering original products from Trezor, Ledger, SecuX, Yubico, and more with warranty, Portuguese-language support, and delivery throughout Brazil.</p>
+        <p class="lang-en">As an official collaborator, I'm responsible for creating and updating all hardware wallet courses on the platform, helping thousands of people use their devices as safely as possible.</p>
+
+        <p class="lang-es">KriptoBR es la mayor y más antigua reventa de hardware wallets del mundo, ofreciendo productos originales de Trezor, Ledger, SecuX, Yubico y más con garantía, soporte en portugués y entrega para todo Brasil.</p>
+        <p class="lang-es">Como colaborador oficial, soy responsable de crear y actualizar todos los cursos de hardware wallets en la plataforma, ayudando a miles de personas a usar sus dispositivos de forma segura.</p>
+
+        <div class="partner-wallets">
+          <span class="wallet-badge">Trezor</span>
+          <span class="wallet-badge">Ledger</span>
+          <span class="wallet-badge">SecuX</span>
+          <span class="wallet-badge">Yubico</span>
+          <span class="wallet-badge">Key-ID</span>
+        </div>
+      </div>
+      <div class="partner-visual">
+        <img class="partner-logo" src="https://kriptobr.com/wp-content/uploads/2023/11/logo.svg" alt="KriptoBR Logo" onerror="this.style.display='none'">
+        <p class="partner-tagline lang-pt">A maior e mais antiga revenda de hardware wallets do mundo</p>
+        <p class="partner-tagline lang-en">The world's largest and oldest hardware wallet reseller</p>
+        <p class="partner-tagline lang-es">La mayor y más antigua reventa de hardware wallets del mundo</p>
+        <a href="https://www.kriptobr.com" target="_blank" rel="noopener" class="btn-primary" style="margin-top: 24px;">
+          <span class="lang-pt">Visitar KriptoBR</span>
+          <span class="lang-en">Visit KriptoBR</span>
+          <span class="lang-es">Visitar KriptoBR</span>
+          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section class="section" id="contato" style="background: var(--bg-secondary); border-top: 1px solid var(--border-color);">
+  <div class="container">
+    <div class="sec-label lang-pt">Contato</div><div class="sec-label lang-en">Contact</div><div class="sec-label lang-es">Contacto</div>
+    <div class="sec-title lang-pt">Vamos conversar?</div><div class="sec-title lang-en">Let's talk?</div><div class="sec-title lang-es">¿Hablamos?</div>
+    <div class="sec-desc lang-pt">Entre em contato para agendar sua consultoria ou tirar dúvidas.</div>
+    <div class="sec-desc lang-en">Get in touch to book your consultation or ask questions.</div>
+    <div class="sec-desc lang-es">Contáctenos para agendar su consultoría o resolver dudas.</div>
+
     <div class="contact-grid">
-      <form class="contact-form fade-in" onsubmit="event.preventDefault(); alert('Mensagem enviada! Leonardo entrará em contato em breve.');">
+      <form class="contact-form fade-in" id="contactForm">
         <div class="form-group">
-          <label for="name">Nome</label>
-          <input type="text" id="name" placeholder="Seu nome completo" required>
+          <label for="user_name" class="lang-pt">Nome</label><label for="user_name" class="lang-en">Name</label><label for="user_name" class="lang-es">Nombre</label>
+          <input type="text" id="user_name" name="user_name" required>
         </div>
         <div class="form-group">
-          <label for="email">E-mail</label>
-          <input type="email" id="email" placeholder="seu@email.com" required>
+          <label for="user_email">E-mail</label>
+          <input type="email" id="user_email" name="user_email" required>
         </div>
         <div class="form-group">
-          <label for="whatsapp">WhatsApp</label>
-          <input type="tel" id="whatsapp" placeholder="(00) 00000-0000">
+          <label for="user_whatsapp">WhatsApp</label>
+          <input type="tel" id="user_whatsapp" name="user_whatsapp">
         </div>
         <div class="form-group">
-          <label for="message">Mensagem</label>
-          <textarea id="message" placeholder="Descreva brevemente como posso te ajudar..." required></textarea>
+          <label for="message" class="lang-pt">Mensagem</label><label for="message" class="lang-en">Message</label><label for="message" class="lang-es">Mensaje</label>
+          <textarea id="message" name="message" required></textarea>
         </div>
-        <button type="submit" class="btn-primary" style="justify-content: center;">
-          Enviar Mensagem
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <div id="formStatus" class="form-status"></div>
+        <button type="submit" class="btn-primary" id="submitBtn" style="justify-content: center; width: 100%;">
+          <span class="lang-pt">Enviar Mensagem</span>
+          <span class="lang-en">Send Message</span>
+          <span class="lang-es">Enviar Mensaje</span>
+          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </form>
+
       <div class="contact-info fade-in">
         <a href="mailto:leoreinol@gmail.com" class="contact-card">
-          <div class="contact-icon">✉️</div>
+          <div class="c-icon">✉️</div>
           <div>
-            <div class="cc-label">E-mail</div>
-            <div class="cc-value">leoreinol@gmail.com</div>
+            <div class="c-label">E-mail</div>
+            <div class="c-value">leoreinol@gmail.com</div>
           </div>
         </a>
-        <a href="https://www.instagram.com/leonardoscaburi" target="_blank" class="contact-card">
-          <div class="contact-icon">📸</div>
+        <a href="https://www.instagram.com/leonardoscaburi" target="_blank" rel="noopener" class="contact-card">
+          <div class="c-icon">📸</div>
           <div>
-            <div class="cc-label">Instagram</div>
-            <div class="cc-value">@leonardoscaburi</div>
+            <div class="c-label">Instagram</div>
+            <div class="c-value">@leonardoscaburi</div>
           </div>
         </a>
-        <a href="https://t.me/LeonardoScaburiReinol" target="_blank" class="contact-card">
-          <div class="contact-icon">✈️</div>
+        <a href="https://t.me/LeonardoScaburiReinol" target="_blank" rel="noopener" class="contact-card">
+          <div class="c-icon">✈️</div>
           <div>
-            <div class="cc-label">Telegram</div>
-            <div class="cc-value">@LeonardoScaburiReinol</div>
+            <div class="c-label">Telegram</div>
+            <div class="c-value">@LeonardoScaburiReinol</div>
           </div>
         </a>
-        <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" class="contact-card">
-          <div class="contact-icon">▶️</div>
+        <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" rel="noopener" class="contact-card">
+          <div class="c-icon">▶️</div>
           <div>
-            <div class="cc-label">YouTube</div>
-            <div class="cc-value">Leonardo Scaburi Reinol</div>
+            <div class="c-label">YouTube</div>
+            <div class="c-value">Leonardo Scaburi Reinol</div>
           </div>
         </a>
-        <div class="social-links">
-          <a href="https://www.instagram.com/leonardoscaburi" target="_blank" class="social-link" aria-label="Instagram">📸</a>
-          <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" class="social-link" aria-label="YouTube">▶️</a>
-          <a href="https://t.me/LeonardoScaburiReinol" target="_blank" class="social-link" aria-label="Telegram">✈️</a>
-          <a href="https://x.com/leonardoscaburi" target="_blank" class="social-link" aria-label="X/Twitter">𝕏</a>
-          <a href="https://www.tiktok.com/@leonardoscaburi" target="_blank" class="social-link" aria-label="TikTok">🎵</a>
+        <div class="social-row">
+          <a href="https://www.instagram.com/leonardoscaburi" target="_blank" rel="noopener" class="social-ico" aria-label="Instagram">📸</a>
+          <a href="https://www.youtube.com/@LeonardoScaburiReinol" target="_blank" rel="noopener" class="social-ico" aria-label="YouTube">▶️</a>
+          <a href="https://t.me/LeonardoScaburiReinol" target="_blank" rel="noopener" class="social-ico" aria-label="Telegram">✈️</a>
+          <a href="https://x.com/leonardoscaburi" target="_blank" rel="noopener" class="social-ico" aria-label="X">𝕏</a>
+          <a href="https://www.tiktok.com/@leonardoscaburi" target="_blank" rel="noopener" class="social-ico" aria-label="TikTok">🎵</a>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Where to Buy -->
-<section class="section" style="padding: 60px 0; text-align: center;">
-  <div class="container">
-    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">Onde comprar sua hardware wallet com segurança:</p>
-    <a href="https://www.kriptobr.com" target="_blank" style="color: var(--accent-amber); font-weight: 700; font-size: 1.1rem; text-decoration: none; transition: opacity 0.3s;">
-      🛒 KriptoBR — A maior e mais antiga revenda de hardware wallets do mundo
-    </a>
-  </div>
-</section>
-
-<!-- Footer -->
+<!-- ═══ FOOTER ═══ -->
 <footer class="footer">
   <div class="container">
-    <p>&copy; 2026 Leonardo Scaburi Reinol. Todos os direitos reservados.</p>
-    <div class="kriptobr-badge">
-      Compre sua hardware wallet na <a href="https://www.kriptobr.com" target="_blank">&nbsp;KriptoBR</a>
-    </div>
+    <p>&copy; 2026 Leonardo Scaburi Reinol. <span class="lang-pt">Todos os direitos reservados.</span><span class="lang-en">All rights reserved.</span><span class="lang-es">Todos los derechos reservados.</span></p>
+    <p style="margin-top: 8px;">
+      <span class="lang-pt">Compre sua hardware wallet na</span>
+      <span class="lang-en">Buy your hardware wallet at</span>
+      <span class="lang-es">Compre su hardware wallet en</span>
+      <a href="https://www.kriptobr.com" target="_blank" rel="noopener">&nbsp;KriptoBR</a>
+    </p>
   </div>
 </footer>
 
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════════════ -->
 <script>
-// Navbar scroll effect
+// ── Theme Toggle ──
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  updateThemeIcons();
+}
+function updateThemeIcons() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.querySelectorAll('.theme-toggle').forEach(b => b.textContent = isDark ? '🌙' : '☀️');
+}
+// Load saved theme
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeIcons();
+}
+
+// ── Language ──
+function setLang(lang) {
+  document.documentElement.setAttribute('data-lang', lang);
+  localStorage.setItem('lang', lang);
+  // Update active button states
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    const langMap = { '🇧🇷': 'pt', '🇺🇸': 'en', '🇪🇸': 'es' };
+    btn.classList.toggle('active', langMap[btn.textContent.trim()] === lang);
+  });
+  // Update HTML lang attribute
+  const langCodes = { pt: 'pt-BR', en: 'en', es: 'es' };
+  document.documentElement.lang = langCodes[lang] || 'pt-BR';
+}
+
+// Auto-detect language from browser/location
+function detectLanguage() {
+  const saved = localStorage.getItem('lang');
+  if (saved) { setLang(saved); return; }
+  const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+  if (browserLang.startsWith('es')) { setLang('es'); }
+  else if (browserLang.startsWith('en')) { setLang('en'); }
+  else { setLang('pt'); }
+}
+detectLanguage();
+
+// ── Mobile menu ──
+function closeMobile() {
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+// ── Navbar scroll ──
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 50);
 });
 
-// Fade-in on scroll
-const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+// ── Fade-in on scroll ──
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-    }
-  });
-}, observerOptions);
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-// Smooth scroll for anchor links
+// ── Smooth scroll ──
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     e.preventDefault();
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+});
+
+// ═══════════════════════════════════════════
+// CONTACT FORM — EmailJS
+// ═══════════════════════════════════════════
+// SETUP INSTRUCTIONS FOR LEONARDO:
+// 1. Go to https://www.emailjs.com/ and create a free account
+// 2. Add a Gmail service (connect leoreinol@gmail.com) — note the Service ID
+// 3. Create an email template with variables: {{user_name}}, {{user_email}}, {{user_whatsapp}}, {{message}}
+//    Set "To Email" to: leoreinol@gmail.com — note the Template ID
+// 4. Go to Account > API Keys and copy your Public Key
+// 5. Replace the 3 values below:
+
+const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';   // ← Replace
+const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';   // ← Replace  
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // ← Replace
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const status = document.getElementById('formStatus');
+  const lang = document.documentElement.getAttribute('data-lang') || 'pt';
+
+  const msgs = {
+    sending: { pt: 'Enviando...', en: 'Sending...', es: 'Enviando...' },
+    success: { pt: 'Mensagem enviada com sucesso! Leonardo entrará em contato em breve.', en: 'Message sent successfully! Leonardo will get back to you soon.', es: '¡Mensaje enviado con éxito! Leonardo se pondrá en contacto pronto.' },
+    error: { pt: 'Erro ao enviar. Tente novamente ou envie um e-mail para leoreinol@gmail.com', en: 'Error sending. Please try again or email leoreinol@gmail.com', es: 'Error al enviar. Intente de nuevo o envíe un email a leoreinol@gmail.com' }
+  };
+
+  btn.disabled = true;
+  btn.innerHTML = `<span>${msgs.sending[lang]}</span>`;
+  status.className = 'form-status';
+  status.style.display = 'none';
+
+  try {
+    // If EmailJS keys are not configured, use mailto fallback
+    if (EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+      const name = document.getElementById('user_name').value;
+      const email = document.getElementById('user_email').value;
+      const whatsapp = document.getElementById('user_whatsapp').value;
+      const message = document.getElementById('message').value;
+      const subject = encodeURIComponent('Contato via Site - ' + name);
+      const body = encodeURIComponent(
+        'Nome: ' + name + '\n' +
+        'E-mail: ' + email + '\n' +
+        'WhatsApp: ' + whatsapp + '\n\n' +
+        'Mensagem:\n' + message
+      );
+      window.location.href = 'mailto:leoreinol@gmail.com?subject=' + subject + '&body=' + body;
+      status.className = 'form-status success';
+      status.textContent = msgs.success[lang];
+      this.reset();
+    } else {
+      await emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, this);
+      status.className = 'form-status success';
+      status.textContent = msgs.success[lang];
+      this.reset();
+    }
+  } catch (err) {
+    status.className = 'form-status error';
+    status.textContent = msgs.error[lang];
+    console.error('EmailJS error:', err);
+  }
+
+  btn.disabled = false;
+  const btnTexts = { pt: 'Enviar Mensagem', en: 'Send Message', es: 'Enviar Mensaje' };
+  btn.innerHTML = `<span>${btnTexts[lang]}</span><svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
 });
 </script>
 </body>
