@@ -764,6 +764,158 @@ body::after {
 }
 .social-ico:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
+/* ═══════════════════════════════════════════
+   SLIDER CAPTCHA
+   ═══════════════════════════════════════════ */
+.slider-captcha {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color 0.3s;
+}
+.slider-captcha.verified { border-color: rgba(16, 185, 129, 0.4); }
+.slider-track {
+  position: relative;
+  height: 44px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.slider-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+  border-radius: 8px;
+  pointer-events: none;
+}
+.slider-fill.complete {
+  background: linear-gradient(90deg, rgba(16,185,129,0.2), #10b981);
+}
+.slider-text {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 500;
+  color: var(--text-secondary);
+  pointer-events: none;
+  transition: color 0.3s;
+}
+.slider-captcha.verified .slider-text { color: #fff; font-weight: 600; }
+.slider-handle {
+  position: absolute;
+  left: 0; top: 0;
+  width: 44px; height: 44px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: grab;
+  transition: transform 0.3s ease, background 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  touch-action: none;
+}
+.slider-captcha.verified .slider-handle {
+  background: #10b981;
+  cursor: default;
+}
+.slider-handle:active { cursor: grabbing; }
+.slider-handle svg { width: 20px; height: 20px; color: #000; }
+.slider-captcha.verified .slider-handle svg { color: #fff; }
+
+/* ═══════════════════════════════════════════
+   SUCCESS CARD (replaces form on send)
+   ═══════════════════════════════════════════ */
+.success-card {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 16px;
+  padding: 48px 36px;
+  text-align: center;
+  animation: successPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.success-card.show { display: block; }
+@keyframes successPop {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.check-circle {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  border: 2px solid #10b981;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  position: relative;
+}
+.check-circle::before {
+  content: '';
+  position: absolute; inset: -2px;
+  border-radius: 50%;
+  border: 2px solid #10b981;
+  opacity: 0;
+  animation: checkPulse 1.5s ease-out infinite;
+}
+@keyframes checkPulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+.check-circle svg {
+  width: 40px; height: 40px;
+  stroke: #10b981; stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: drawCheck 0.6s 0.2s ease-out forwards;
+}
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+.success-card h3 {
+  font-size: 1.5rem; font-weight: 800;
+  margin-bottom: 10px; letter-spacing: -0.02em;
+}
+.success-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem; line-height: 1.6;
+  margin-bottom: 8px;
+}
+.success-card .sent-detail {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 0.78rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text-muted);
+  background: var(--bg-primary);
+  padding: 8px 16px;
+  border-radius: 50px;
+  border: 1px solid var(--border-color);
+}
+.success-card .resend-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 28px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-size: 0.88rem; font-weight: 500;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  transition: border-color 0.3s, background 0.3s;
+}
+.success-card .resend-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+/* Submit button disabled state */
+#submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 /* Footer */
 .footer {
   padding: 32px 0;
@@ -1240,7 +1392,7 @@ body::after {
           <li class="lang-en">Access through the KriptoBR platform</li>
           <li class="lang-es">Acceso a través de la plataforma KriptoBR</li>
         </ul>
-        <a href="https://kriptobr.com/?afiliado=10019" target="_blank" rel="noopener" class="btn-primary">
+        <a href="https://www.kriptobr.com" target="_blank" rel="noopener" class="btn-primary">
           <span class="lang-pt">Acessar Cursos na KriptoBR</span>
           <span class="lang-en">Access Courses at KriptoBR</span>
           <span class="lang-es">Acceder a los Cursos en KriptoBR</span>
@@ -1391,7 +1543,7 @@ body::after {
       </details>
       <details class="faq-item lang-pt">
         <summary>Onde eu compro uma hardware wallet original?</summary>
-        <div class="faq-answer">Recomendo a <a href="https://kriptobr.com/?afiliado=10019" target="_blank" rel="noopener" style="color: var(--accent);">KriptoBR</a> — a maior e mais antiga revenda autorizada de hardware wallets do mundo, com produtos originais de Trezor, Ledger, SecuX, Yubico e mais. Nunca compre hardware wallet de revendedor desconhecido ou em marketplaces sem garantia: dispositivos adulterados podem roubar seus fundos.</div>
+        <div class="faq-answer">Recomendo a <a href="https://www.kriptobr.com" target="_blank" rel="noopener" style="color: var(--accent);">KriptoBR</a> — a maior e mais antiga revenda autorizada de hardware wallets do mundo, com produtos originais de Trezor, Ledger, SecuX, Yubico e mais. Nunca compre hardware wallet de revendedor desconhecido ou em marketplaces sem garantia: dispositivos adulterados podem roubar seus fundos.</div>
       </details>
       <details class="faq-item lang-pt">
         <summary>Você pode recuperar minha carteira se eu perdi a seed phrase?</summary>
@@ -1417,7 +1569,7 @@ body::after {
       </details>
       <details class="faq-item lang-en">
         <summary>Where can I buy an original hardware wallet?</summary>
-        <div class="faq-answer">I recommend <a href="https://kriptobr.com/?afiliado=10019" target="_blank" rel="noopener" style="color: var(--accent);">KriptoBR</a> — the world's largest and oldest authorized hardware wallet reseller, with original products from Trezor, Ledger, SecuX, Yubico and more. Never buy hardware wallets from unknown resellers or unverified marketplaces: tampered devices can steal your funds.</div>
+        <div class="faq-answer">I recommend <a href="https://www.kriptobr.com" target="_blank" rel="noopener" style="color: var(--accent);">KriptoBR</a> — the world's largest and oldest authorized hardware wallet reseller, with original products from Trezor, Ledger, SecuX, Yubico and more. Never buy hardware wallets from unknown resellers or unverified marketplaces: tampered devices can steal your funds.</div>
       </details>
       <details class="faq-item lang-en">
         <summary>Can you recover my wallet if I lost my seed phrase?</summary>
@@ -1443,7 +1595,7 @@ body::after {
       </details>
       <details class="faq-item lang-es">
         <summary>¿Dónde compro una hardware wallet original?</summary>
-        <div class="faq-answer">Recomiendo <a href="https://kriptobr.com/?afiliado=10019" target="_blank" rel="noopener" style="color: var(--accent);">KriptoBR</a> — la mayor y más antigua reventa autorizada de hardware wallets del mundo, con productos originales de Trezor, Ledger, SecuX y más. Nunca compres en revendedores desconocidos: dispositivos adulterados pueden robar tus fondos.</div>
+        <div class="faq-answer">Recomiendo <a href="https://www.kriptobr.com" target="_blank" rel="noopener" style="color: var(--accent);">KriptoBR</a> — la mayor y más antigua reventa autorizada de hardware wallets del mundo, con productos originales de Trezor, Ledger, SecuX y más. Nunca compres en revendedores desconocidos: dispositivos adulterados pueden robar tus fondos.</div>
       </details>
       <details class="faq-item lang-es">
         <summary>¿Puedes recuperar mi billetera si perdí la seed phrase?</summary>
@@ -1491,7 +1643,7 @@ body::after {
         <p class="partner-tagline lang-pt">A maior e mais antiga revenda de hardware wallets do mundo</p>
         <p class="partner-tagline lang-en">World's largest and oldest hardware wallet reseller</p>
         <p class="partner-tagline lang-es">La mayor reventa de hardware wallets del mundo</p>
-        <a href="https://kriptobr.com/?afiliado=10019" target="_blank" rel="noopener" class="btn-primary" style="margin-top: 22px;">
+        <a href="https://www.kriptobr.com" target="_blank" rel="noopener" class="btn-primary" style="margin-top: 22px;">
           <span class="lang-pt">Visitar KriptoBR</span><span class="lang-en">Visit KriptoBR</span><span class="lang-es">Visitar KriptoBR</span>
           <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
         </a>
@@ -1510,35 +1662,79 @@ body::after {
     <div class="sec-desc lang-es">Contáctenos para agendar su consultoría o resolver dudas.</div>
 
     <div class="contact-grid">
-      <form class="contact-form fade-in" id="contactForm">
-        <div class="form-group">
-          <label for="user_name" class="lang-pt">Nome</label><label for="user_name" class="lang-en">Name</label><label for="user_name" class="lang-es">Nombre</label>
-          <input type="text" id="user_name" name="name" required>
-        </div>
-        <div class="form-group">
-          <label for="user_email">E-mail</label>
-          <input type="email" id="user_email" name="email" required>
-        </div>
-        <div class="form-group">
-          <label for="user_whatsapp">WhatsApp</label>
-          <input type="tel" id="user_whatsapp" name="whatsapp">
-        </div>
-        <div class="form-group">
-          <label for="message" class="lang-pt">Mensagem</label><label for="message" class="lang-en">Message</label><label for="message" class="lang-es">Mensaje</label>
-          <textarea id="message" name="message" required></textarea>
-        </div>
+      <div class="contact-form-wrapper fade-in">
+        <form class="contact-form" id="contactForm">
+          <div class="form-group">
+            <label for="user_name" class="lang-pt">Nome</label><label for="user_name" class="lang-en">Name</label><label for="user_name" class="lang-es">Nombre</label>
+            <input type="text" id="user_name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="user_email">E-mail</label>
+            <input type="email" id="user_email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="user_whatsapp">WhatsApp</label>
+            <input type="tel" id="user_whatsapp" name="whatsapp">
+          </div>
+          <div class="form-group">
+            <label for="message" class="lang-pt">Mensagem</label><label for="message" class="lang-en">Message</label><label for="message" class="lang-es">Mensaje</label>
+            <textarea id="message" name="message" required></textarea>
+          </div>
 
-        <!-- Honeypot for spam -->
-        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+          <!-- Honeypot for spam (invisible to humans, bots fill it) -->
+          <input type="text" name="_honey" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
 
-        <div id="formStatus" class="form-status"></div>
-        <button type="submit" class="btn-primary" id="submitBtn" style="justify-content: center; width: 100%;">
-          <span class="btn-label">
-            <span class="lang-pt">Enviar Mensagem</span><span class="lang-en">Send Message</span><span class="lang-es">Enviar Mensaje</span>
-          </span>
-          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-      </form>
+          <!-- Slider Captcha -->
+          <div class="slider-captcha" id="sliderCaptcha">
+            <div class="slider-track">
+              <div class="slider-fill" id="sliderFill"></div>
+              <div class="slider-text" id="sliderText">
+                <span class="lang-pt">Arraste para confirmar →</span>
+                <span class="lang-en">Slide to verify →</span>
+                <span class="lang-es">Deslice para verificar →</span>
+              </div>
+              <div class="slider-handle" id="sliderHandle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div id="formStatus" class="form-status"></div>
+          <button type="submit" class="btn-primary" id="submitBtn" disabled style="justify-content: center; width: 100%;">
+            <span class="btn-label">
+              <span class="lang-pt">Enviar Mensagem</span><span class="lang-en">Send Message</span><span class="lang-es">Enviar Mensaje</span>
+            </span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </form>
+
+        <!-- Success Card (shown after successful send) -->
+        <div class="success-card" id="successCard">
+          <div class="check-circle">
+            <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3 class="lang-pt">Mensagem enviada!</h3>
+          <h3 class="lang-en">Message sent!</h3>
+          <h3 class="lang-es">¡Mensaje enviado!</h3>
+
+          <p class="lang-pt">Sua mensagem chegou na caixa de entrada do Leonardo.<br>Ele entrará em contato em breve.</p>
+          <p class="lang-en">Your message has reached Leonardo's inbox.<br>He'll get back to you soon.</p>
+          <p class="lang-es">Tu mensaje llegó a la bandeja de Leonardo.<br>Se pondrá en contacto contigo pronto.</p>
+
+          <div class="sent-detail">
+            <span class="lang-pt">📧 Enviado para leoreinol@gmail.com</span>
+            <span class="lang-en">📧 Sent to leoreinol@gmail.com</span>
+            <span class="lang-es">📧 Enviado a leoreinol@gmail.com</span>
+          </div>
+
+          <button type="button" class="resend-btn" onclick="resetForm()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M3 21v-5h5"/></svg>
+            <span class="lang-pt">Enviar outra mensagem</span>
+            <span class="lang-en">Send another message</span>
+            <span class="lang-es">Enviar otro mensaje</span>
+          </button>
+        </div>
+      </div>
 
       <div class="contact-info fade-in">
         <a href="mailto:leoreinol@gmail.com" class="contact-card">
@@ -1587,7 +1783,7 @@ body::after {
     <p>&copy; 2026 Leonardo Scaburi Reinol. <span class="lang-pt">Todos os direitos reservados.</span><span class="lang-en">All rights reserved.</span><span class="lang-es">Todos los derechos reservados.</span></p>
     <p style="margin-top: 8px;">
       <span class="lang-pt">Compre sua hardware wallet na</span><span class="lang-en">Buy your hardware wallet at</span><span class="lang-es">Compre su hardware wallet en</span>
-      <a href="https://kriptobr.com/?afiliado=10019" target="_blank" rel="noopener">&nbsp;KriptoBR</a>
+      <a href="https://www.kriptobr.com" target="_blank" rel="noopener">&nbsp;KriptoBR</a>
     </p>
   </div>
 </footer>
@@ -1648,36 +1844,177 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 // ═══════════════════════════════════════════
+// SLIDER CAPTCHA — Anti-bot sem cadastro/terceiros
+// ═══════════════════════════════════════════
+const sliderCaptcha = document.getElementById('sliderCaptcha');
+const sliderHandle = document.getElementById('sliderHandle');
+const sliderTrack = sliderCaptcha.querySelector('.slider-track');
+const sliderFill = document.getElementById('sliderFill');
+const sliderText = document.getElementById('sliderText');
+const submitBtn = document.getElementById('submitBtn');
+
+let sliderState = {
+  isDragging: false,
+  startX: 0,
+  currentX: 0,
+  verified: false
+};
+
+function getMaxX() {
+  return sliderTrack.offsetWidth - sliderHandle.offsetWidth;
+}
+
+function sliderStart(e) {
+  if (sliderState.verified) return;
+  e.preventDefault();
+  sliderState.isDragging = true;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  sliderState.startX = clientX - sliderState.currentX;
+  sliderHandle.style.transition = 'none';
+  sliderFill.style.transition = 'none';
+}
+
+function sliderMove(e) {
+  if (!sliderState.isDragging || sliderState.verified) return;
+  e.preventDefault();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const maxX = getMaxX();
+  sliderState.currentX = Math.max(0, Math.min(maxX, clientX - sliderState.startX));
+  sliderHandle.style.transform = `translateX(${sliderState.currentX}px)`;
+  sliderFill.style.width = `${sliderState.currentX + sliderHandle.offsetWidth}px`;
+
+  if (sliderState.currentX / maxX >= 0.95) {
+    sliderComplete();
+  }
+}
+
+function sliderEnd() {
+  if (!sliderState.isDragging || sliderState.verified) return;
+  sliderState.isDragging = false;
+  const maxX = getMaxX();
+  if (sliderState.currentX / maxX < 0.95) {
+    sliderHandle.style.transition = 'transform 0.3s ease';
+    sliderFill.style.transition = 'width 0.3s ease';
+    sliderHandle.style.transform = 'translateX(0)';
+    sliderFill.style.width = '0';
+    sliderState.currentX = 0;
+  }
+}
+
+function sliderComplete() {
+  sliderState.verified = true;
+  sliderState.isDragging = false;
+  const maxX = getMaxX();
+  sliderHandle.style.transition = 'transform 0.2s ease';
+  sliderFill.style.transition = 'width 0.2s ease';
+  sliderHandle.style.transform = `translateX(${maxX}px)`;
+  sliderFill.style.width = '100%';
+  sliderFill.classList.add('complete');
+  sliderCaptcha.classList.add('verified');
+
+  // Update text in current language
+  const currentLang = document.documentElement.getAttribute('data-lang') || 'pt';
+  const verifiedTexts = { pt: '✓ Verificado', en: '✓ Verified', es: '✓ Verificado' };
+  sliderText.innerHTML = `<span>${verifiedTexts[currentLang]}</span>`;
+
+  // Update handle icon to checkmark
+  sliderHandle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  // Enable submit button
+  submitBtn.disabled = false;
+}
+
+function resetSlider() {
+  sliderState = { isDragging: false, startX: 0, currentX: 0, verified: false };
+  sliderHandle.style.transition = 'transform 0.3s ease';
+  sliderFill.style.transition = 'width 0.3s ease';
+  sliderHandle.style.transform = 'translateX(0)';
+  sliderFill.style.width = '0';
+  sliderFill.classList.remove('complete');
+  sliderCaptcha.classList.remove('verified');
+  sliderHandle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  submitBtn.disabled = true;
+  // Restore lang spans
+  sliderText.innerHTML = `
+    <span class="lang-pt">Arraste para confirmar →</span>
+    <span class="lang-en">Slide to verify →</span>
+    <span class="lang-es">Deslice para verificar →</span>
+  `;
+}
+
+sliderHandle.addEventListener('mousedown', sliderStart);
+sliderHandle.addEventListener('touchstart', sliderStart, { passive: false });
+document.addEventListener('mousemove', sliderMove);
+document.addEventListener('touchmove', sliderMove, { passive: false });
+document.addEventListener('mouseup', sliderEnd);
+document.addEventListener('touchend', sliderEnd);
+
+// ═══════════════════════════════════════════
 // CONTACT FORM via Formsubmit.co
 // 100% gratuito, SEM cadastro
+// Anti-spam: honeypot + slider captcha + time-check
 // ═══════════════════════════════════════════
-// Como funciona:
-// 1. Quando o primeiro visitante enviar o formulário, o Leonardo
-//    receberá um e-mail de confirmação no leoreinol@gmail.com
+// COMO FUNCIONA:
+// 1. No primeiro envio, Leonardo recebe email de confirmação no leoreinol@gmail.com
 // 2. Ele clica no link de confirmação UMA ÚNICA VEZ
 // 3. A partir daí, todos os envios chegam direto no Gmail dele
-// Nenhuma conta, API key ou cadastro necessário!
+//
+// UPGRADE OPCIONAL (Cloudflare Turnstile - mais robusto):
+// Como o site já está no Cloudflare, é só:
+// 1. Cloudflare Dashboard > Turnstile > Add site
+// 2. Copiar o site key
+// 3. Substituir o slider-captcha por:
+//    <div class="cf-turnstile" data-sitekey="SEU_KEY"></div>
+//    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
+// Funciona invisível na maioria dos casos, máxima proteção, gratuito.
+
+// Track when form was loaded (for time-based bot detection)
+const formLoadTime = Date.now();
+const MIN_FILL_TIME = 3000; // 3 seconds minimum
 
 document.getElementById('contactForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const btn = document.getElementById('submitBtn');
   const status = document.getElementById('formStatus');
   const lang = document.documentElement.getAttribute('data-lang') || 'pt';
 
   const msgs = {
     sending: { pt: 'Enviando...', en: 'Sending...', es: 'Enviando...' },
-    success: { pt: '✓ Mensagem enviada! Leonardo entrará em contato em breve.', en: '✓ Message sent! Leonardo will reply soon.', es: '✓ ¡Mensaje enviado! Leonardo responderá pronto.' },
-    error: { pt: 'Erro ao enviar. Por favor, envie um e-mail direto para leoreinol@gmail.com', en: 'Error sending. Please email leoreinol@gmail.com directly', es: 'Error al enviar. Por favor envíe email a leoreinol@gmail.com' }
+    tooFast: { pt: 'Por favor, aguarde alguns segundos antes de enviar.', en: 'Please wait a few seconds before sending.', es: 'Por favor espere unos segundos antes de enviar.' },
+    captcha: { pt: 'Por favor, complete a verificação acima.', en: 'Please complete the verification above.', es: 'Por favor complete la verificación.' },
+    error: { pt: 'Erro ao enviar. Tente novamente ou envie um e-mail direto para leoreinol@gmail.com', en: 'Error sending. Please email leoreinol@gmail.com directly', es: 'Error al enviar. Por favor envíe email a leoreinol@gmail.com' }
   };
 
+  // ── Layer 1: Slider captcha check
+  if (!sliderState.verified) {
+    status.className = 'form-status error';
+    status.textContent = msgs.captcha[lang];
+    sliderCaptcha.style.borderColor = '#ef4444';
+    setTimeout(() => sliderCaptcha.style.borderColor = '', 2000);
+    return;
+  }
+
+  // ── Layer 2: Time-based check (bots fill forms in <1s)
+  const elapsed = Date.now() - formLoadTime;
+  if (elapsed < MIN_FILL_TIME) {
+    status.className = 'form-status error';
+    status.textContent = msgs.tooFast[lang];
+    return;
+  }
+
+  // ── Layer 3: Honeypot check (silent)
+  const formData = new FormData(this);
+  if (formData.get('_honey')) {
+    // Bot detected - silently "succeed" to avoid revealing the trap
+    showSuccessCard();
+    return;
+  }
+
   // Disable button and show "sending"
-  btn.disabled = true;
-  btn.querySelector('.btn-label').textContent = msgs.sending[lang];
+  submitBtn.disabled = true;
+  submitBtn.querySelector('.btn-label').textContent = msgs.sending[lang];
   status.className = 'form-status';
   status.style.display = 'none';
 
-  // Build form data
-  const formData = new FormData(this);
   const data = {
     name: formData.get('name'),
     email: formData.get('email'),
@@ -1688,12 +2025,6 @@ document.getElementById('contactForm').addEventListener('submit', async function
     _template: 'table'
   };
 
-  // Honeypot check (spam prevention)
-  if (formData.get('_honey')) {
-    btn.disabled = false;
-    return; // silently ignore bots
-  }
-
   try {
     const response = await fetch('https://formsubmit.co/ajax/leoreinol@gmail.com', {
       method: 'POST',
@@ -1702,15 +2033,13 @@ document.getElementById('contactForm').addEventListener('submit', async function
     });
 
     if (response.ok) {
-      status.className = 'form-status success';
-      status.textContent = msgs.success[lang];
-      this.reset();
+      showSuccessCard();
     } else {
       throw new Error('Submission failed');
     }
   } catch (err) {
-    // Fallback: open email client with pre-filled message
-    console.warn('Formsubmit failed, falling back to mailto:', err);
+    console.warn('Formsubmit failed, fallback to mailto:', err);
+    // Fallback: open user's email client with pre-filled content
     const subject = encodeURIComponent('Contato via Site - ' + data.name);
     const body = encodeURIComponent(
       'Nome: ' + data.name + '\n' +
@@ -1719,16 +2048,30 @@ document.getElementById('contactForm').addEventListener('submit', async function
       'Mensagem:\n' + data.message
     );
     window.location.href = 'mailto:leoreinol@gmail.com?subject=' + subject + '&body=' + body;
-    status.className = 'form-status success';
-    status.textContent = msgs.success[lang];
-    this.reset();
+    showSuccessCard();
   }
-
-  // Reset button
-  btn.disabled = false;
-  const btnLabels = { pt: 'Enviar Mensagem', en: 'Send Message', es: 'Enviar Mensaje' };
-  btn.querySelector('.btn-label').textContent = btnLabels[lang];
 });
+
+function showSuccessCard() {
+  document.getElementById('contactForm').style.display = 'none';
+  const card = document.getElementById('successCard');
+  card.classList.add('show');
+  // Smooth scroll to keep card in view
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetForm() {
+  document.getElementById('successCard').classList.remove('show');
+  const form = document.getElementById('contactForm');
+  form.style.display = 'flex';
+  form.reset();
+  resetSlider();
+  document.getElementById('formStatus').style.display = 'none';
+  // Reset button label
+  const lang = document.documentElement.getAttribute('data-lang') || 'pt';
+  const btnLabels = { pt: 'Enviar Mensagem', en: 'Send Message', es: 'Enviar Mensaje' };
+  submitBtn.querySelector('.btn-label').textContent = btnLabels[lang];
+}
 </script>
 </body>
 </html>
